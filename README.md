@@ -11,6 +11,7 @@ Powered by [React](https://reactjs.org/) + [React Redux](https://react-redux.js.
 &nbsp;
 
 ## Usage
+install pnpm as an npm package with $ npm i -g pnpm.  [link](https://blog.logrocket.com/javascript-package-managers-compared/)
 
 ```bash
 pnpm install
