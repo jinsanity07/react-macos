@@ -1,9 +1,8 @@
 export default function VSCode() {
   return (
     <iframe
-      className="h-full w-full bg-vscode"
+      className="size-full bg-[#202020]"
       src="https://github1s.com/Renovamen/playground-macos/blob/main/README.md"
-      frameBorder="0"
       title="VSCode"
     />
   );

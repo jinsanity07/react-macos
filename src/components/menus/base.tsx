@@ -1,22 +1,20 @@
-import type { ReactNode } from "react";
+import React from "react";
 
 interface MenuItemProps {
   onClick?: (e: React.MouseEvent<HTMLLIElement>) => void;
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
 interface MenuItemGroupProps {
   border?: boolean;
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
 const MenuItem = (props: MenuItemProps) => {
   return (
     <li
       onClick={props.onClick}
-      className="px-5 leading-6 cursor-default"
-      text="black hover:white dark:(white hover:black)"
-      bg="hover:blue-500 dark:hover:blue-400"
+      className="leading-6 cursor-default px-2.5 rounded hover:text-white hover:bg-blue-500"
     >
       {props.children}
     </li>
@@ -26,9 +24,9 @@ const MenuItem = (props: MenuItemProps) => {
 const MenuItemGroup = (props: MenuItemGroupProps) => {
   const border =
     props.border === false
-      ? ""
-      : "border-b-2 border-gray-400 dark:border-gray-500";
-  return <ul className={`py-1 ${border}`}>{props.children}</ul>;
+      ? "pb-1"
+      : "after:(content-empty block pb-0 h-1.5 max-w-full mx-2 border-b border-c-400)";
+  return <ul className={`relative px-1 pt-1 ${border}`}>{props.children}</ul>;
 };
 
 export { MenuItem, MenuItemGroup };

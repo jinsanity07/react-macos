@@ -1,7 +1,5 @@
 import { useMotionValue } from "framer-motion";
 import { apps } from "~/configs";
-import { useAppSelector } from "~/redux/hooks";
-import DockItem from "./DockItem";
 
 interface DockProps {
   open: (id: string) => void;
@@ -20,9 +18,9 @@ export default function Dock({
   toggleLaunchpad,
   hide
 }: DockProps) {
-  const { dockSize, dockMag } = useAppSelector((state) => ({
-    dockSize: state.dock.size,
-    dockMag: state.dock.mag
+  const { dockSize, dockMag } = useStore((state) => ({
+    dockSize: state.dockSize,
+    dockMag: state.dockMag
   }));
 
   const openApp = (id: string) => {
@@ -37,18 +35,17 @@ export default function Dock({
 
   return (
     <div
-      className={`dock w-full sm:w-max fixed left-0 right-0 mx-auto bottom-0 ${
-        hide ? "z-0" : "z-50"
-      } overflow-x-scroll sm:overflow-x-visible`}
+      className={`dock fixed inset-x-0 mx-auto bottom-1 ${hide ? "z-0" : "z-50"}`}
+      w="full sm:max"
+      overflow="x-scroll sm:x-visible"
     >
       <ul
-        className="mx-auto w-max px-2 space-x-2 flex backdrop-blur-2xl"
-        bg="white opacity-20 dark:(black opacity-20)"
-        border="t l r rounded-none sm:rounded-t-lg gray-400 opacity-30 dark:(gray-500 opacity-30)"
+        className="flex space-x-2 px-2 backdrop-blur-2xl bg-c-white/20"
+        border="~ c-400/40 rounded-none sm:rounded-xl"
         onMouseMove={(e) => mouseX.set(e.nativeEvent.x)}
         onMouseLeave={() => mouseX.set(null)}
         style={{
-          height: `${(dockSize as number) + 15}px`
+          height: `${(dockSize + 15) / 16}rem`
         }}
       >
         {apps.map((app) => (
@@ -62,8 +59,8 @@ export default function Dock({
             openApp={openApp}
             isOpen={app.desktop && showApps[app.id]}
             link={app.link}
-            dockSize={dockSize as number}
-            dockMag={dockMag as number}
+            dockSize={dockSize}
+            dockMag={dockMag}
           />
         ))}
       </ul>

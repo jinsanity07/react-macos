@@ -1,13 +1,6 @@
-import { useState, useEffect } from "react";
-import type { RefObject } from "react";
-
-import TopBar from "~/components/menus/TopBar";
-import Dock from "~/components/dock/Dock";
-import Launchpad from "~/components/Launchpad";
-import Window from "~/components/Window";
-import Spotlight from "~/components/Spotlight";
+import React from "react";
 import { apps, wallpapers } from "~/configs";
-import { useAppSelector } from "~/redux/hooks";
+import { minMarginY } from "~/utils";
 import type { MacActions } from "~/types";
 
 interface DesktopState {
@@ -30,8 +23,6 @@ interface DesktopState {
   spotlight: boolean;
 }
 
-const minMarginY = 24;
-
 export default function Desktop(props: MacActions) {
   const [state, setState] = useState({
     showApps: {},
@@ -46,11 +37,11 @@ export default function Desktop(props: MacActions) {
   } as DesktopState);
 
   const [spotlightBtnRef, setSpotlightBtnRef] =
-    useState<RefObject<HTMLDivElement> | null>(null);
+    useState<React.RefObject<HTMLDivElement> | null>(null);
 
-  const { dark, brightness } = useAppSelector((state) => ({
-    dark: state.system.dark,
-    brightness: state.system.brightness
+  const { dark, brightness } = useStore((state) => ({
+    dark: state.dark,
+    brightness: state.brightness
   }));
 
   const getAppsData = (): void => {
@@ -62,7 +53,7 @@ export default function Desktop(props: MacActions) {
     apps.forEach((app) => {
       showApps = {
         ...showApps,
-        [app.id]: app.show
+        [app.id]: !!app.show
       };
       appsZ = {
         ...appsZ,
@@ -102,7 +93,7 @@ export default function Desktop(props: MacActions) {
     setState({ ...state, spotlight: !state.spotlight });
   };
 
-  const setWinowsPosition = (id: string): void => {
+  const setWindowPosition = (id: string): void => {
     const r = document.querySelector(`#window-${id}`) as HTMLElement;
     const rect = r.getBoundingClientRect();
     r.style.setProperty(
@@ -139,7 +130,7 @@ export default function Desktop(props: MacActions) {
   };
 
   const minimizeApp = (id: string): void => {
-    setWinowsPosition(id);
+    setWindowPosition(id);
 
     // get the corrosponding dock icon's position
     let r = document.querySelector(`#dock-${id}`) as HTMLElement;
@@ -215,12 +206,15 @@ export default function Desktop(props: MacActions) {
     return apps.map((app) => {
       if (app.desktop && state.showApps[app.id]) {
         const props = {
-          title: app.title,
           id: app.id,
+          title: app.title,
           width: app.width,
           height: app.height,
           minWidth: app.minWidth,
           minHeight: app.minHeight,
+          aspectRatio: app.aspectRatio,
+          x: app.x,
+          y: app.y,
           z: state.appsZ[app.id],
           max: state.maxApps[app.id],
           min: state.minApps[app.id],
@@ -231,9 +225,9 @@ export default function Desktop(props: MacActions) {
         };
 
         return (
-          <Window key={`desktop-app-${app.id}`} {...props}>
+          <AppWindow key={`desktop-app-${app.id}`} {...props}>
             {app.content}
-          </Window>
+          </AppWindow>
         );
       } else {
         return <div key={`desktop-app-${app.id}`} />;
@@ -243,7 +237,7 @@ export default function Desktop(props: MacActions) {
 
   return (
     <div
-      className="w-full h-full overflow-hidden bg-center bg-cover"
+      className="size-full overflow-hidden bg-center bg-cover"
       style={{
         backgroundImage: `url(${dark ? wallpapers.night : wallpapers.day})`,
         filter: `brightness( ${(brightness as number) * 0.7 + 50}% )`
@@ -272,7 +266,7 @@ export default function Desktop(props: MacActions) {
           openApp={openApp}
           toggleLaunchpad={toggleLaunchpad}
           toggleSpotlight={toggleSpotlight}
-          btnRef={spotlightBtnRef as RefObject<HTMLDivElement>}
+          btnRef={spotlightBtnRef as React.RefObject<HTMLDivElement>}
         />
       )}
 

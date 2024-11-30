@@ -1,6 +1,4 @@
 // Borrowed from: https://github.com/streamich/react-use/blob/master/src/useBattery.ts
-import { useEffect, useState } from "react";
-
 export interface BatteryState {
   charging: boolean;
   chargingTime: number;
@@ -25,9 +23,7 @@ export interface UseBatteryState extends BatteryState {
 }
 
 const isNavigator = typeof navigator !== "undefined";
-const nav: NavigatorWithPossibleBattery | undefined = isNavigator
-  ? navigator
-  : undefined;
+const nav: NavigatorWithPossibleBattery | undefined = isNavigator ? navigator : undefined;
 const isBatteryApiSupported = nav && typeof nav.getBattery === "function";
 
 const defaultState: BatteryState = {

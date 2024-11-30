@@ -1,14 +1,13 @@
-import React, { useState } from "react";
+import React from "react";
 import { createRoot } from "react-dom/client";
-import { Provider } from "react-redux";
 
-import { store } from "~/redux/store";
 import Desktop from "~/pages/Desktop";
 import Login from "~/pages/Login";
 import Boot from "~/pages/Boot";
 
 import "@unocss/reset/tailwind.css";
 import "uno.css";
+import "katex/dist/katex.min.css";
 import "~/styles/index.css";
 
 export default function App() {
@@ -68,9 +67,7 @@ const rootElement = document.getElementById("root") as HTMLElement;
 const root = createRoot(rootElement);
 
 root.render(
-  <Provider store={store}>
-    <React.StrictMode>
-      <App />
-    </React.StrictMode>
-  </Provider>
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
 );

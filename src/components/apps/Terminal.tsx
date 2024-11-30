@@ -1,26 +1,13 @@
-import React, { Component } from "react";
+import React from "react";
 import { terminal } from "~/configs";
 import type { TerminalData } from "~/types";
 
-const emojis = [
-  "\\(o_o)/",
-  "(˚Δ˚)b",
-  "(^-^*)",
-  "(╯‵□′)╯",
-  "\\(°ˊДˋ°)/",
-  "╰(‵□′)╯"
-];
+const CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789落霞与孤鹜齐飞秋水共长天一色";
+const EMOJIS = ["\\(o_o)/", "(˚Δ˚)b", "(^-^*)", "(╯‵□′)╯", "\\(°ˊДˋ°)/", "╰(‵□′)╯"];
 
 const getEmoji = () => {
-  return emojis[Math.floor(Math.random() * emojis.length)];
+  return EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
 };
-
-const characters =
-  "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789富强民主文明和谐自由平等公正法治爱国敬业诚信友善";
-
-interface HowDareProps {
-  setRMRF: (value: boolean) => void;
-}
 
 interface TerminalState {
   rmrf: boolean;
@@ -28,83 +15,76 @@ interface TerminalState {
 }
 
 // rain animation is adopted from: https://codepen.io/P3R0/pen/MwgoKv
-class HowDare extends Component<HowDareProps> {
-  private canvas = null as HTMLCanvasElement | null;
-  private ctx = null as CanvasRenderingContext2D | null;
-  private intervalId = null as any;
-  private emoji = getEmoji();
-  private fontSize = 12;
-  private drops = [] as number[];
+const HowDare = ({ setRMRF }: { setRMRF: (value: boolean) => void }) => {
+  const FONT_SIZE = 12;
 
-  componentDidMount() {
-    const container = document.querySelector(
-      "#how-dare-container"
-    ) as HTMLElement;
+  const [emoji, setEmoji] = useState("");
+  const [drops, setDrops] = useState<number[]>([]);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
-    this.canvas = document.querySelector("#how-dare") as HTMLCanvasElement;
-    this.canvas.height = container.offsetHeight;
-    this.canvas.width = container.offsetWidth;
-    this.ctx = this.canvas.getContext("2d");
+  useEffect(() => {
+    const container = containerRef.current;
+    const canvas = canvasRef.current;
 
-    const columns = this.canvas.width / this.fontSize;
-    this.drops = [];
-    // x: x coordinate, 1: y-coordinate
-    for (let x = 0; x < columns; x++) this.drops[x] = 1;
+    if (!container || !canvas) return;
 
-    this.intervalId = setInterval(this.rain.bind(this), 33);
-  }
+    canvas.height = container.offsetHeight;
+    canvas.width = container.offsetWidth;
 
-  componentWillUnmount() {
-    clearInterval(this.intervalId);
-  }
+    const columns = Math.floor(canvas.width / FONT_SIZE);
+    setDrops(Array(columns).fill(1));
 
-  rain() {
-    this.ctx = this.ctx as CanvasRenderingContext2D;
-    this.canvas = this.canvas as HTMLCanvasElement;
+    setEmoji(getEmoji());
+  }, []);
 
-    this.ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
-    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+  const rain = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
 
-    this.ctx.fillStyle = "#2e9244";
-    this.ctx.font = `${this.fontSize}px arial`;
+    const ctx = canvas.getContext("2d")!;
 
-    for (let i = 0; i < this.drops.length; i++) {
-      const text = characters[Math.floor(Math.random() * characters.length)];
+    ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      this.ctx.fillText(text, i * this.fontSize, this.drops[i] * this.fontSize);
+    ctx.fillStyle = "#2e9244";
+    ctx.font = `${FONT_SIZE}px arial`;
 
-      // sends the drop back to the top randomly after it has crossed the screen
-      // adding randomness to the reset to make the drops scattered on the Y axis
-      if (
-        this.drops[i] * this.fontSize > this.canvas.height &&
-        Math.random() > 0.975
-      )
-        this.drops[i] = 0;
+    drops.forEach((y, x) => {
+      const text = CHARACTERS[Math.floor(Math.random() * CHARACTERS.length)];
+      ctx.fillText(text, x * FONT_SIZE, y * FONT_SIZE);
+    });
 
-      // increments Y coordinate
-      this.drops[i]++;
-    }
-  }
-
-  render() {
-    return (
-      <div
-        id="how-dare-container"
-        className="fixed w-full h-full bg-black text-white"
-        onClick={() => this.props.setRMRF(false)}
-      >
-        <canvas id="how-dare"></canvas>
-        <div className="font-avenir absolute text-center h-28 mx-auto -mt-20 bottom-0 left-0 right-0 top-1/2">
-          <div className="text-4xl">{this.emoji}</div>
-          <div className="text-3xl mt-4">HOW DARE YOU!</div>
-          <div className="mt-4">Click to go back</div>
-        </div>
-      </div>
+    setDrops(
+      drops.map((y) => {
+        // sends the drop back to the top randomly after it has crossed the screen
+        // adding randomness to the reset to make the drops scattered on the Y axis
+        if (y * FONT_SIZE > canvas.height && Math.random() > 0.975) return 1;
+        // increments Y coordinate
+        else return y + 1;
+      })
     );
-  }
-}
+  };
 
-export default class Terminal extends Component<{}, TerminalState> {
+  useInterval(rain, 33);
+
+  return (
+    <div
+      ref={containerRef}
+      className="fixed size-full bg-black text-white"
+      onClick={() => setRMRF(false)}
+    >
+      <canvas ref={canvasRef}></canvas>
+      <div className="font-avenir absolute h-28 text-center space-y-4 m-auto inset-0">
+        <div text-4xl>{emoji}</div>
+        <div text-3xl>HOW DARE YOU!</div>
+        <div>Click to go back</div>
+      </div>
+    </div>
+  );
+};
+
+export default class Terminal extends React.Component<{}, TerminalState> {
   private history = [] as string[];
   private curHistory = 0;
   private curInputTimes = 0;
@@ -134,7 +114,7 @@ export default class Terminal extends Component<{}, TerminalState> {
     this.generateInputRow(this.curInputTimes);
   }
 
-  reset = (): void => {
+  reset = () => {
     const terminal = document.querySelector("#terminal-content") as HTMLElement;
     terminal.innerHTML = "";
   };
@@ -163,7 +143,7 @@ export default class Terminal extends Component<{}, TerminalState> {
   };
 
   // move into a specified folder
-  cd = (args?: string): void => {
+  cd = (args?: string) => {
     if (args === undefined || args === "~") {
       // move to root
       this.curDirPath = [];
@@ -194,15 +174,13 @@ export default class Terminal extends Component<{}, TerminalState> {
   };
 
   // display content of a specified folder
-  ls = (): void => {
+  ls = () => {
     const result = [];
     for (const item of this.curChildren) {
       result.push(
         <span
           key={`terminal-result-ls-${this.curInputTimes}-${item.id}`}
-          className={`${
-            item.type === "file" ? "text-white" : "text-purple-300"
-          }`}
+          className={`${item.type === "file" ? "text-white" : "text-purple-300"}`}
         >
           {item.title}
         </span>
@@ -215,7 +193,7 @@ export default class Terminal extends Component<{}, TerminalState> {
   };
 
   // display content of a specified file
-  cat = (args?: string): void => {
+  cat = (args?: string) => {
     const file = this.curChildren.find((item: TerminalData) => {
       return item.title === args && item.type === "file";
     });
@@ -231,49 +209,47 @@ export default class Terminal extends Component<{}, TerminalState> {
   };
 
   // clear terminal
-  clear = (): void => {
+  clear = () => {
     this.curInputTimes += 1;
     this.reset();
   };
 
-  help = (): void => {
+  help = () => {
     const help = (
       <ul className="list-disc ml-6 pb-1.5">
         <li>
-          <span className="text-red-400">cat {"<file>"}</span> - See the content
-          of {"<file>"}
+          <span text-red-400>cat {"<file>"}</span> - See the content of {"<file>"}
         </li>
         <li>
-          <span className="text-red-400">cd {"<dir>"}</span> - Move into
-          {" <dir>"}, "cd .." to move to the parent directory, "cd" or "cd ~" to
-          return to root
+          <span text-red-400>cd {"<dir>"}</span> - Move into
+          {" <dir>"}, "cd .." to move to the parent directory, "cd" or "cd ~" to return to
+          root
         </li>
         <li>
-          <span className="text-red-400">ls</span> - See files and directories
-          in the current directory
+          <span text-red-400>ls</span> - See files and directories in the current
+          directory
         </li>
         <li>
-          <span className="text-red-400">clear</span> - Clear the screen
+          <span text-red-400>clear</span> - Clear the screen
         </li>
         <li>
-          <span className="text-red-400">help</span> - Display this help menu
+          <span text-red-400>help</span> - Display this help menu
         </li>
         <li>
-          <span className="text-red-400">rm -rf /</span> - :)
+          <span text-red-400>rm -rf /</span> - :)
         </li>
         <li>
-          press <span className="text-red-400">up arrow / down arrow</span> -
-          Select history commands
+          press <span text-red-400>up arrow / down arrow</span> - Select history commands
         </li>
         <li>
-          press <span className="text-red-400">tab</span> - Auto complete
+          press <span text-red-400>tab</span> - Auto complete
         </li>
       </ul>
     );
     this.generateResultRow(this.curInputTimes, help);
   };
 
-  autoComplete = (text: string): string => {
+  autoComplete = (text: string) => {
     if (text === "") return text;
 
     const input = text.split(" ");
@@ -290,16 +266,14 @@ export default class Terminal extends Component<{}, TerminalState> {
     } else if (cmd === "cd" || cmd === "cat") {
       const type = cmd === "cd" ? "folder" : "file";
       const guess = this.curChildren.find((item: TerminalData) => {
-        return (
-          item.type === type && item.title.substring(0, args.length) === args
-        );
+        return item.type === type && item.title.substring(0, args.length) === args;
       });
       if (guess !== undefined) result = cmd + " " + guess.title;
     }
     return result;
   };
 
-  keyPress = (e: React.KeyboardEvent): void => {
+  keyPress = (e: React.KeyboardEvent) => {
     const keyCode = e.key;
     const inputElement = document.querySelector(
       `#terminal-input-${this.curInputTimes}`
@@ -358,26 +332,23 @@ export default class Terminal extends Component<{}, TerminalState> {
     }
   };
 
-  focusOnInput = (id: number): void => {
-    const input = document.querySelector(
-      `#terminal-input-${id}`
-    ) as HTMLInputElement;
+  focusOnInput = (id: number) => {
+    const input = document.querySelector(`#terminal-input-${id}`) as HTMLInputElement;
     input.focus();
   };
 
-  generateInputRow = (id: number): void => {
+  generateInputRow = (id: number) => {
     const newRow = (
-      <div key={`terminal-input-row-${id}`} className="w-full h-6 flex">
-        <div className="w-max flex-center-v">
-          <span className="text-yellow-200">
-            zou@macbook-pro{" "}
-            <span className="text-green-300">{this.getCurDirName()}</span>
+      <div key={`terminal-input-row-${id}`} flex>
+        <div className="w-max hstack space-x-1.5">
+          <span text-yellow-200>
+            zou@macbook-pro <span text-green-300>{this.getCurDirName()}</span>
           </span>
-          <span className="ml-1.5 text-red-400">{">"}</span>
+          <span text-red-400>{">"}</span>
         </div>
         <input
           id={`terminal-input-${id}`}
-          className="flex-1 w-full px-1 text-white outline-none bg-transparent"
+          className="flex-1 px-1 text-white outline-none bg-transparent"
           onKeyDown={this.keyPress}
           autoFocus={true}
         />
@@ -388,10 +359,7 @@ export default class Terminal extends Component<{}, TerminalState> {
 
   generateResultRow = (id: number, result: JSX.Element) => {
     const newRow = (
-      <div
-        key={`terminal-result-row-${id}`}
-        className="w-full h-max leading-5 flex"
-      >
+      <div key={`terminal-result-row-${id}`} break-all>
         {result}
       </div>
     );
@@ -401,21 +369,18 @@ export default class Terminal extends Component<{}, TerminalState> {
   render() {
     return (
       <div
-        className="terminal font-terminal font-normal relative w-full h-full overflow-y-scroll"
-        bg="gray-800 opacity-90"
+        className="terminal font-terminal font-normal relative h-full bg-gray-800/90 overflow-y-scroll"
         text="white sm"
         onClick={() => this.focusOnInput(this.curInputTimes)}
       >
         {this.state.rmrf && (
-          <HowDare
-            setRMRF={(value: boolean) => this.setState({ rmrf: value })}
-          />
+          <HowDare setRMRF={(value: boolean) => this.setState({ rmrf: value })} />
         )}
-        <div className="w-full h-max pt-2 px-1.5 ">
-          <span className="text-green-300">ヽ(ˋ▽ˊ)ノ</span>: Hey, you found the
-          terminal! Type `help` to get started.
+        <div p="y-2 x-1.5">
+          <span className="text-green-300">ヽ(ˋ▽ˊ)ノ</span>: Hey, you found the terminal!
+          Type `help` to get started.
         </div>
-        <div id="terminal-content" className="mt-2 px-1.5 pb-2">
+        <div id="terminal-content" p="x-1.5 b-2">
           {this.state.content}
         </div>
       </div>

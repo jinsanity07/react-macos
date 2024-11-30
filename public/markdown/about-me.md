@@ -2,30 +2,31 @@
 
 ## Biography
 
-Hey there! I'm a ~~dragon lost in human world~~ [Computer Science](https://www.bu.edu/cs/) master's student at [Boston University](https://www.bu.edu/). Before that, I got my bachelor's degree in [Software Engineering](http://sse.tongji.edu.cn/) at [Tongji University](https://www.tongji.edu.cn/).
+Hey there! I am a PhD student at the [Computer Science and Engineering](https://www.eecs.psu.edu/) department of [Pennsylvania State University](https://www.psu.edu/). Previously, I received my master's degree in [Computer Science](https://www.bu.edu/cs/) from [Boston University](https://www.bu.edu/) and my bachelor’s degree in [Software Engineering](http://sse.tongji.edu.cn/) from [Tongji University](https://www.tongji.edu.cn/).
 
 I'm trying to find a balance between research and engineering.
 
-My research interests lie primarily in exploring the capability of machines to be continual and efficient, like meta-learning, few-shot learning and continual learning. I'm also working on multi-modal retrieval for my internship.
+My current research interests primarily focus on understanding and enhancing the continuity, generalizability, efficiency, and other key properties of machine learning. I am also interested in large multimodal models.
 
-I'm also learning to build machine learning softwares and systems. I'm also learning TypeScript, React and Vue.
+I'm also learning web development and building machine learning software and systems.
 
 
 ## Contact
 
 Contact me by:
 
-- Email: [renovamenzxh@gmail.com](mailto:renovamenzxh@gmail.com) / [xiaohan.zou@foxmail.com](mailto:xiaohan.zou@foxmail.com)
+- Email: [renovamenzxh@gmail.com](mailto:renovamenzxh@gmail.com)
 - Github: [@Renovamen](https://github.com/Renovamen)
+- [Google Scholar](https://scholar.google.com/citations?user=RuW6xgMAAAAJ)
 - Linkedin: [xiaohan-zou](https://www.linkedin.com/in/xiaohan-zou)
-- 知乎: [@Renovamen](https://www.zhihu.com/people/chao-neng-gui-su)
-- Blog: [zxh.io](https://zxh.io)
+- 知乎: [@西伯利亚大恶龙](https://www.zhihu.com/people/chao-neng-gui-su)
+- Personal Website: [zxh.me](https://zxh.me)
 
 
 ## Résumé
 
-- Normal version: [English](https://zxh.io/files/cv/en/brief.pdf) / [中文](https://zxh.io/files/cv/cn/brief.pdf)
+- Normal version: [English](https://zxh.me/files/cv/en.pdf) / [中文](https://zxh.me/files/cv/cn.pdf)
 
   中文版的更新很可能不及时
 
-- Interesting version: [portfolio.zxh.io](https://portfolio.zxh.io) / [resume.zxh.io](https://resume.zxh.io)
+- Interesting version: [portfolio.zxh.me](https://portfolio.zxh.me) / [resume.zxh.io](https://resume.zxh.io)

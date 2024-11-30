@@ -1,15 +1,18 @@
-import { useRef } from "react";
-import type { RefObject } from "react";
+import React from "react";
 import useRaf from "@rooks/use-raf";
-import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
-import type { MotionValue } from "framer-motion";
-import { useWindowSize } from "~/hooks";
+import {
+  motion,
+  useMotionValue,
+  useSpring,
+  useTransform,
+  type MotionValue
+} from "framer-motion";
 
 // Hover effect is adopted from https://github.com/PuruVJ/macos-web/blob/main/src/components/dock/DockItem.tsx
 
 const useDockHoverAnimation = (
   mouseX: MotionValue,
-  ref: RefObject<HTMLImageElement>,
+  ref: React.RefObject<HTMLImageElement>,
   dockSize: number,
   dockMag: number
 ) => {
@@ -35,13 +38,10 @@ const useDockHoverAnimation = (
   const beyondTheDistanceLimit = distanceLimit + 1;
 
   const distance = useMotionValue(beyondTheDistanceLimit);
-  const widthPX = useSpring(
-    useTransform(distance, distanceInput, widthOutput),
-    {
-      stiffness: 1700,
-      damping: 90
-    }
-  );
+  const widthPX = useSpring(useTransform(distance, distanceInput, widthOutput), {
+    stiffness: 1700,
+    damping: 90
+  });
 
   const width = useTransform(widthPX, (width) => `${width / 16}rem`);
 
@@ -97,18 +97,18 @@ export default function DockItem({
     <li
       id={`dock-${id}`}
       onClick={desktop || id === "launchpad" ? () => openApp(id) : () => {}}
-      className="flex-center-v flex-col justify-end mb-1 transition duration-150 ease-in origin-bottom"
+      className="relative flex flex-col justify-end mb-1"
     >
       <p
-        className="tooltip absolute px-3 py-1 rounded-md text-sm"
-        bg="gray-300 opacity-80 dark:(gray-600 opacity-80)"
+        className="tooltip absolute inset-x-0 mx-auto w-max rounded-md bg-c-300/80"
+        p="x-3 y-1"
+        text="sm c-black"
       >
         {title}
       </p>
       {link ? (
         <a href={link} target="_blank" rel="noreferrer">
           <motion.img
-            className="w-12"
             ref={imgRef}
             src={img}
             alt={title}
@@ -119,7 +119,6 @@ export default function DockItem({
         </a>
       ) : (
         <motion.img
-          className="w-12"
           ref={imgRef}
           src={img}
           alt={title}
@@ -129,9 +128,7 @@ export default function DockItem({
         />
       )}
       <div
-        className={`h-1 w-1 m-0 rounded-full bg-gray-800 dark:bg-gray-100 ${
-          isOpen ? "" : "invisible"
-        }`}
+        className={`size-1 mx-auto rounded-full bg-c-800 ${isOpen ? "" : "invisible"}`}
       />
     </li>
   );

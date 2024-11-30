@@ -1,14 +1,11 @@
-import { BsBattery, BsFillLightningChargeFill } from "react-icons/bs";
-import { useBattery } from "~/hooks";
-
 export default function Battery() {
   const batteryState = useBattery();
 
-  const width = (): number => {
+  const width = () => {
     return 0.1 + batteryState.level * 0.96;
   };
 
-  const color = (): string => {
+  const color = () => {
     if (batteryState.charging) return "bg-green-400";
 
     if (batteryState.level < 0.2) return "bg-red-500";
@@ -17,21 +14,13 @@ export default function Battery() {
   };
 
   return (
-    <div className="flex-center">
-      <span className="text-xs mt-0.5 mr-2">
-        {(batteryState.level * 100).toFixed()}%
-      </span>
-      <div className="relative">
-        <BsBattery size={24} />
-        <div
-          className={`battery-level ${color()}`}
-          style={{ width: `${width()}rem` }}
-        />
+    <div className="hstack space-x-2">
+      <span text-xs>{(batteryState.level * 100).toFixed()}%</span>
+      <div className="relative hstack">
+        <span className="i-bi:battery text-2xl" />
+        <div className={`battery-level ${color()}`} style={{ width: `${width()}rem` }} />
         {batteryState.charging && (
-          <BsFillLightningChargeFill
-            size={12}
-            className="absolute top-1/2 -mt-1.5 left-0 ml-1"
-          />
+          <span className="i-bi:lightning-charge-fill absolute inset-0 m-auto -translate-x-0.5 text-xs" />
         )}
       </div>
     </div>

@@ -1,11 +1,11 @@
 # playground-macos
 
-My portfolio website simulating macOS's GUI: https://portfolio.zxh.io
+My portfolio website simulating macOS's GUI: https://portfolio.zxh.me
 
-Powered by [React](https://reactjs.org/) + [React Redux](https://react-redux.js.org/) + [UnoCSS](https://uno.antfu.me/) + [TypeScript](https://www.typescriptlang.org/) + [Vite](https://vitejs.dev/).
+Powered by [React](https://reactjs.org/) + [Zustand](https://zustand-demo.pmnd.rs/) + [UnoCSS](https://uno.antfu.me/) + [TypeScript](https://www.typescriptlang.org/) + [Vite](https://vitejs.dev/).
 
-![day](./public/screenshots/day.png)
-![night](./public/screenshots/night.png)
+![light mode](./public/screenshots/light.png)
+![dark mode](./public/screenshots/dark.png)
 
 
 &nbsp;
@@ -13,13 +13,21 @@ Powered by [React](https://reactjs.org/) + [React Redux](https://react-redux.js.
 ## Usage
 install pnpm as an npm package with $ npm i -g pnpm.  [link](https://blog.logrocket.com/javascript-package-managers-compared/)
 
+Clone the repo and install dependencies:
+
 ```bash
 pnpm install
+```
 
-# serve with hot reload, open http://localhost:3000 to view it in the browser
+Start dev server (with hot reloading):
+
+```bash
 pnpm dev
+```
 
-# build for production with minification to the `dist` folder
+Build for production with minification to the `dist` folder:
+
+```bash
 pnpm build
 ```
 
@@ -28,17 +36,22 @@ pnpm build
 
 ## Changelog
 
-- **Update 2021.12.05**: Simulated the real state of the device's battery using [Battery API](https://developer.mozilla.org/en-US/docs/Web/API/Battery_Status_API). On the [browsers that don't support this API](https://developer.mozilla.org/en-US/docs/Web/API/Battery_Status_API#browser_compatibility), the charge level will be displayed as 100%.
+- **Update 2023.06.26**: Improve [FaceTime](https://support.apple.com/en-us/HT208176).
 
-- **Update 2021.12.05**: Refactored this project by using functional components and hooks to make the code cleaner. See [this branch](https://github.com/Renovamen/playground-macos/tree/class-component) for the previous version written using class components.
+- **Update 2023.06.25**: Add [Typora](https://typora.io/), built on top of [Milkdown](https://milkdown.dev/).
+
+- **Update 2021.12.05**: Simulated the device's actual battery state using [Battery API](https://developer.mozilla.org/en-US/docs/Web/API/Battery_Status_API), displaying 100% charge on [unsupported browsers](https://developer.mozilla.org/en-US/docs/Web/API/Battery_Status_API#browser_compatibility).
+
+- **Update 2021.12.05**: Refactored for cleaner code by utilizing functional components and hooks. Refer to [this branch](https://github.com/Renovamen/playground-macos/tree/class-component) for the previous version implemented with class components.
 
 
 &nbsp;
 
 ## Credits
 
-- [macOS Big Sur](https://www.apple.com/in/macos/big-sur/)
-- [macOS Catalina](https://www.apple.com/bw/macos/catalina/)
+- macOS
+  - [Monterey](https://www.apple.com/macos/monterey/)
+  - [Catalina](https://www.apple.com/bw/macos/catalina/)
 - [macOS Icon Gallery](https://www.macosicongallery.com/)
 - [sindresorhus/file-icon-cli](https://github.com/sindresorhus/file-icon-cli)
 - [vivek9patel.github.io](https://github.com/vivek9patel/vivek9patel.github.io)

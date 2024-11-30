@@ -13,9 +13,8 @@ const terminal: TerminalData[] = [
         content: (
           <div className="py-1">
             <div>
-              Hi! This is Xiaohan Zou, now a Computer Science master's student
-              at Boston University. Before that, I got my bachelor's degree in
-              Software Engineering at Tongji University.
+              Hi, this is Xiaohan Zou. I am a PhD student at the Computer Science and
+              Engineering department of Pennsylvania State University.
             </div>
           </div>
         )
@@ -24,16 +23,15 @@ const terminal: TerminalData[] = [
         id: "about-interests",
         title: "interests.txt",
         type: "file",
-        content:
-          "Theoretical Machine Learning / Computer Vision / Vision-Language Learning"
+        content: "Machine Learning / Computer Vision / Multimodal Learning"
       },
-      // {
-      //   id: "about-who-cares",
-      //   title: "who-cares.txt",
-      //   type: "file",
-      //   content:
-      //     "I'm open to summer research opportunities for summer 2022 lol."
-      // },
+      {
+        id: "about-who-cares",
+        title: "who-cares.txt",
+        type: "file",
+        content:
+          "I'm looking for a research internship for Summer 2024. I'm open to collaboration on research projects."
+      },
       {
         id: "about-contact",
         title: "contact.txt",
@@ -49,15 +47,6 @@ const terminal: TerminalData[] = [
                 rel="noreferrer"
               >
                 renovamenzxh@gmail.com
-              </a>{" "}
-              /{" "}
-              <a
-                className="text-blue-300"
-                href="mailto:xiaohan.zou@foxmail.com"
-                target="_blank"
-                rel="noreferrer"
-              >
-                xiaohan.zou@foxmail.com
               </a>
             </li>
             <li>
@@ -68,7 +57,17 @@ const terminal: TerminalData[] = [
                 target="_blank"
                 rel="noreferrer"
               >
-                https://github.com/Renovamen
+                @Renovamen
+              </a>
+            </li>
+            <li>
+              <a
+                className="text-blue-300"
+                href="https://scholar.google.com/citations?user=RuW6xgMAAAAJ"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Google Scholar
               </a>
             </li>
             <li>
@@ -79,18 +78,18 @@ const terminal: TerminalData[] = [
                 target="_blank"
                 rel="noreferrer"
               >
-                https://www.linkedin.com/in/xiaohan-zou
+                xiaohan-zou
               </a>
             </li>
             <li>
-              Blog:{" "}
+              Personal Website:{" "}
               <a
                 className="text-blue-300"
-                href="https://zxh.io"
+                href="https://zxh.me"
                 target="_blank"
                 rel="noreferrer"
               >
-                https://zxh.io
+                https://zxh.me
               </a>
             </li>
             <li>
@@ -101,7 +100,7 @@ const terminal: TerminalData[] = [
                 target="_blank"
                 rel="noreferrer"
               >
-                https://www.zhihu.com/people/chao-neng-gui-su
+                @西伯利亚大恶龙
               </a>
             </li>
           </ul>

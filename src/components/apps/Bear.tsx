@@ -1,13 +1,11 @@
-import { useState, useEffect, useCallback } from "react";
 import ReactMarkdown from "react-markdown";
-import gfm from "remark-gfm";
+import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
+import rehypeExternalLinks from "rehype-external-links";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { dracula, prism } from "react-syntax-highlighter/dist/esm/styles/prism";
-import { GiSettingsKnobs } from "react-icons/gi";
-import { AiOutlineLink } from "react-icons/ai";
-import { IoCloudOfflineOutline } from "react-icons/io5";
 import bear from "~/configs/bear";
-import { useAppSelector } from "~/redux/hooks";
 import type { BearMdData } from "~/types";
 
 interface ContentProps {
@@ -61,21 +59,21 @@ const Highlighter = (dark: boolean): any => {
 
 const Sidebar = ({ cur, setMidBar }: SidebarProps) => {
   return (
-    <div className="w-full h-full bg-gray-700 text-white overflow-y-scroll">
-      <div className="h-12 pr-3 flex-center-v justify-end">
-        <IoCloudOfflineOutline className="mr-3" size={20} />
-        <GiSettingsKnobs size={20} />
+    <div text-white>
+      <div className="h-12 pr-3 hstack space-x-3 justify-end">
+        <span className="i-ic:baseline-cloud-off text-xl" />
+        <span className="i-akar-icons:settings-vertical text-xl" />
       </div>
       <ul>
         {bear.map((item, index) => (
           <li
             key={`bear-sidebar-${item.id}`}
-            className={`pl-6 h-8 flex-center-v cursor-default ${
+            className={`pl-6 h-8 hstack cursor-default ${
               cur === index ? "bg-red-500" : "bg-transparent"
             } ${cur === index ? "" : "hover:bg-gray-600"}`}
             onClick={() => setMidBar(item.md, index)}
           >
-            {item.icon}
+            <span className={item.icon} />
             <span className="ml-2">{item.title}</span>
           </li>
         ))}
@@ -86,51 +84,41 @@ const Sidebar = ({ cur, setMidBar }: SidebarProps) => {
 
 const Middlebar = ({ items, cur, setContent }: MiddlebarProps) => {
   return (
-    <div
-      className="w-full h-full overflow-y-scroll"
-      bg="gray-50 dark:gray-800"
-      border="r gray-300 dark:(gray-600)"
-    >
-      <ul>
-        {items.map((item: BearMdData, index: number) => (
-          <li
-            key={`bear-midbar-${item.id}`}
-            className={`h-24 flex flex-col cursor-default border-l-2 ${
-              cur === index
-                ? "border-red-500 bg-white dark:bg-gray-900"
-                : "border-transparent bg-transparent"
-            } hover:(bg-white dark:bg-gray-900)`}
-            onClick={() => setContent(item.id, item.file, index)}
-          >
-            <div className="h-8 mt-3 flex-center-v flex-none">
-              <div className="-mt-1 w-10 flex-center-h flex-none text-gray-500 dark:text-gray-400">
-                {item.icon}
-              </div>
-              <span className="relative text-gray-900 dark:text-gray-100 flex-grow font-bold">
-                {item.title}
-                {item.link && (
-                  <a
-                    className="absolute top-1 right-4"
-                    href={item.link}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    <AiOutlineLink className="text-gray-500 dark:text-gray-400" />
-                  </a>
-                )}
-              </span>
+    <ul>
+      {items.map((item: BearMdData, index: number) => (
+        <li
+          key={`bear-midbar-${item.id}`}
+          className={`h-24 flex flex-col cursor-default border-l-2 ${
+            cur === index
+              ? "border-red-500 bg-white dark:bg-gray-900"
+              : "border-transparent bg-transparent"
+          } hover:(bg-white dark:bg-gray-900)`}
+          onClick={() => setContent(item.id, item.file, index)}
+        >
+          <div className="h-8 mt-3 hstack">
+            <div className="-mt-1 w-10 vstack text-c-500">
+              <span className={item.icon} />
             </div>
-            <div
-              className="h-16 ml-10 pb-2 pr-1"
-              border="b gray-300 dark:gray-600"
-              text="sm gray-500 dark:gray-400"
-            >
-              {item.excerpt}
-            </div>
-          </li>
-        ))}
-      </ul>
-    </div>
+            <span className="relative flex-1 font-bold" text="gray-900 dark:gray-100">
+              {item.title}
+              {item.link && (
+                <a
+                  pos="absolute top-1 right-4"
+                  href={item.link}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <span className="i-ant-design:link-outlined text-c-500" />
+                </a>
+              )}
+            </span>
+          </div>
+          <div className="flex-1 ml-10" p="b-2 r-1" text="sm c-500" border="b c-300">
+            {item.excerpt}
+          </div>
+        </li>
+      ))}
+    </ul>
   );
 };
 
@@ -162,7 +150,7 @@ const fixImageURL = (text: string, contentURL: string): string => {
 
 const Content = ({ contentID, contentURL }: ContentProps) => {
   const [storeMd, setStoreMd] = useState<{ [key: string]: string }>({});
-  const dark = useAppSelector((state) => state.system.dark);
+  const dark = useStore((state) => state.dark);
 
   const fetchMarkdown = useCallback(
     (id: string, url: string) => {
@@ -184,16 +172,17 @@ const Content = ({ contentID, contentURL }: ContentProps) => {
   }, [contentID, contentURL, fetchMarkdown]);
 
   return (
-    <div className="markdown w-full h-full bg-gray-50 text-gray-700 dark:(bg-gray-800 text-gray-200) overflow-scroll py-6">
-      <div className="w-2/3 px-2 mx-auto">
-        <ReactMarkdown
-          linkTarget="_blank"
-          remarkPlugins={[gfm]}
-          components={Highlighter(dark as boolean)}
-        >
-          {storeMd[contentID]}
-        </ReactMarkdown>
-      </div>
+    <div className="markdown w-2/3 mx-auto px-2 py-6 text-c-700">
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm, remarkMath]}
+        rehypePlugins={[
+          rehypeKatex,
+          [rehypeExternalLinks, { target: "_blank", rel: "noopener noreferrer" }]
+        ]}
+        components={Highlighter(dark as boolean)}
+      >
+        {storeMd[contentID]}
+      </ReactMarkdown>
     </div>
   );
 };
@@ -227,18 +216,18 @@ const Bear = () => {
   };
 
   return (
-    <div className="bear font-avenir flex w-full h-full">
-      <div className="flex-none w-44">
+    <div className="bear font-avenir flex h-full">
+      <div className="w-44 overflow-auto bg-gray-700">
         <Sidebar cur={state.curSidebar} setMidBar={setMidBar} />
       </div>
-      <div className="flex-none w-60">
+      <div className="w-60 overflow-auto" bg="gray-50 dark:gray-800" border="r c-300">
         <Middlebar
           items={state.midbarList}
           cur={state.curMidbar}
           setContent={setContent}
         />
       </div>
-      <div className="flex-grow">
+      <div className="flex-1 overflow-auto" bg="gray-50 dark:gray-800">
         <Content contentID={state.contentID} contentURL={state.contentURL} />
       </div>
     </div>
