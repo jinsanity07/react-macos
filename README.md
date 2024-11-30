@@ -11,6 +11,15 @@ Powered by [React](https://reactjs.org/) + [Zustand](https://zustand-demo.pmnd.r
 &nbsp;
 
 ## Usage
+* download and install [node](https://nodejs.org/en/download/package-manager)
+```bash
+fnm env
+fnm use v22.11.0
+node -v
+
+npm i -g pnpm
+```
+
 install pnpm as an npm package with $ npm i -g pnpm.  [link](https://blog.logrocket.com/javascript-package-managers-compared/)
 
 Clone the repo and install dependencies:
