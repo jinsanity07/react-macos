@@ -34,8 +34,8 @@ const launchpadApps: LaunchpadData[] = [
   {
     id: "what-if",
     title: "My Notebook",
-    img: "img/icons/launchpad/notebook.png",
-    link: "https://note.zxh.io"
+    img: "https://jinsanity07git.github.io/UWMnotebook/src/svg/Mark_RGB_Yellow.svg",
+    link: "https://jinsanity07git.github.io/UWMnotebook"
   },
   {
     id: "cube",
@@ -50,16 +50,16 @@ const launchpadApps: LaunchpadData[] = [
     link: "https://resume.zxh.io/"
   },
   {
-    id: "zelda",
-    title: "Webpage for Zelda",
-    img: "img/icons/launchpad/zelda.png",
-    link: "https://zelda.zxh.io/"
+    id: "soil",
+    title: "Soil Mechanics",
+    img: "https://jinsanity07git.github.io/UWMnotebook/UWM/img/soil%20mechanics.png",
+    link: "https://jinsanity07git.github.io/UWMnotebook/#/UWM/CE335/README"
   },
   {
-    id: "fishmail",
-    title: "Fishmail",
-    img: "img/icons/launchpad/fishmail.png",
-    link: "https://fishmail.vercel.app/"
+    id: "dynamics",
+    title: "Dynamics",
+    img: "https://jinsanity07git.github.io/UWMnotebook/UWM/CE202/Dynamics_img/dynamics_icon.svg",
+    link: "https://jinsanity07git.github.io/UWMnotebook/#/UWM/CE202/Dynamics"
   }
 ];
 

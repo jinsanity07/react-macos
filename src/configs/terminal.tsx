@@ -12,10 +12,7 @@ const terminal: TerminalData[] = [
         type: "file",
         content: (
           <div className="py-1">
-            <div>
-              Hi, this is Xiaohan Zou. I am a PhD student at the Computer Science and
-              Engineering department of Pennsylvania State University.
-            </div>
+            <div>Hi, this is jinsanity.</div>
           </div>
         )
       },
