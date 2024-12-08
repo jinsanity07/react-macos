@@ -9,6 +9,11 @@ Powered by [React](https://reactjs.org/) + [Zustand](https://zustand-demo.pmnd.r
 
 
 &nbsp;
+## git commit
+```bash
+pnpm -v
+git commit -m "[feat] "
+```
 
 ## Usage
 * download and install [node](https://nodejs.org/en/download/package-manager)
