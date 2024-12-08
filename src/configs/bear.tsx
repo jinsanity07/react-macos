@@ -35,6 +35,13 @@ const bear: BearData[] = [
     icon: "i-octicon:repo",
     md: [
       {
+        id: "viz_projectile",
+        title: "Projectile motion",
+        file: "markdown/viz_projetile.md",
+        icon: "i-octicon:browser",
+        excerpt: "Something about this personal portfolio site..."
+      },
+      {
         id: "flint",
         title: "Flint",
         file: "https://raw.githubusercontent.com/Renovamen/flint/main/README.md",
