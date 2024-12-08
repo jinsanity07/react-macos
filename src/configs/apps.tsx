@@ -41,6 +41,17 @@ const apps: AppsData[] = [
     content: <Safari />
   },
   {
+    id: "ownpie",
+    title: "Ownpie",
+    desktop: true,
+    width: 900,
+    height: 600,
+    x: 80,
+    y: -30,
+    img: "img/icons/sunrise-calendar.avif",
+    content: <Ownpie />
+  },
+  {
     id: "vscode",
     title: "VSCode",
     desktop: true,
