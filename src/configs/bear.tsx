@@ -37,7 +37,7 @@ const bear: BearData[] = [
       {
         id: "viz_projectile",
         title: "Projectile motion",
-        file: "markdown/viz_projetile.md",
+        file: "markdown/projects/viz_projetile.md",
         icon: "i-octicon:browser",
         excerpt: "Something about this personal portfolio site..."
       },
