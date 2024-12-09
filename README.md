@@ -45,8 +45,35 @@ Build for production with minification to the `dist` folder:
 pnpm build
 ```
 
-
 &nbsp;
+
+
+
+## icons
+
+**i-ri**
+
+The prefix **`i-ri`** in `i-ri:gamepad-line` indicates that the icon belongs to the **Remix Icon (RI)** library.
+
+1. **`i-` Prefix**: Like with `i-mdi`, this prefix is used in tools like [Iconify](https://iconify.design/) to integrate various icon sets in a consistent way.
+2. **`ri`**: Refers to the [Remix Icon](https://remixicon.com/) library, a set of open-source icons designed for web and user interfaces.
+3. **`gamepad-line`**: This is the specific name of the icon in the Remix Icon library. The suffix `-line` indicates that it's an outline-style icon (as opposed to solid-style).
+
+Visit the official [Remix Icon website](https://remixicon.com/) and search for "gamepad-line."
+
+You can also browse Remix Icon through Iconify, which provides additional options for integrating these icons into your project.
+
+### i-mdi
+
+The prefix **`i-mdi`** in `i-mdi:chart-bar-stacked` refers to an icon library integration, specifically **Material Design Icons (MDI)**. Here's what it means:
+
+**`i-` Prefix**: This prefix is commonly used in tools or libraries like [Iconify](https://iconify.design/), which provide a unified way to include icons from multiple libraries.
+
+**`mdi`**: Refers to the [Material Design Icons](https://materialdesignicons.com/) library, an open-source set of icons inspired by Google's Material Design guidelines.
+
+**`chart-bar-stacked`**: This is the specific icon name in the MDI library.
+
+
 
 ## Changelog
 
