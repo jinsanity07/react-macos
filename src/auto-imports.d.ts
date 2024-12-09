@@ -25,6 +25,7 @@ declare global {
   const VSCode: typeof import('./components/apps/VSCode')['default']
   const WifiMenu: typeof import('./components/menus/WifiMenu')['default']
   const Window: typeof import('./components/Window')['default']
+  const Youtube: typeof import('./components/apps/Youtube')['default']
   const createRef: typeof import('react')['createRef']
   const forwardRef: typeof import('react')['forwardRef']
   const lazy: typeof import('react')['lazy']

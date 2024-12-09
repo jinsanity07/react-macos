@@ -41,10 +41,21 @@ const apps: AppsData[] = [
     content: <Safari />
   },
   {
+    id: "Youtube",
+    title: "Youtube",
+    desktop: true,
+    width: 500,
+    height: 300,
+    x: 80,
+    y: -30,
+    img: "https://www.youtube.com/s/desktop/4981804c/img/logos/favicon_144x144.png",
+    content: <Youtube />
+  },
+  {
     id: "ownpie",
     title: "Ownpie",
     desktop: true,
-    width: 900,
+    width: 350,
     height: 600,
     x: 80,
     y: -30,
