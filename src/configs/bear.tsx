@@ -11,7 +11,7 @@ const bear: BearData[] = [
         title: "About Me",
         file: "markdown/about-me.md",
         icon: "i-la:dragon",
-        excerpt: "Hey there! I'm a dragon lost in human world..."
+        excerpt: "Hey there! welcome to the sanity land..."
       },
       {
         id: "github-stats",
@@ -38,128 +38,43 @@ const bear: BearData[] = [
         id: "viz_projectile",
         title: "Projectile motion",
         file: "markdown/projects/viz_projetile.md",
-        icon: "i-octicon:browser",
-        excerpt: "Something about this personal portfolio site..."
+        icon: "i-bi:arrow-up-right-square-fill",
+        excerpt: "A light weight simulator of projectile motion...",
+        link: "https://jinsanity07git.github.io/blog/files/trim_Functions.html"
       },
       {
-        id: "flint",
-        title: "Flint",
-        file: "https://raw.githubusercontent.com/Renovamen/flint/main/README.md",
-        icon: "i-heroicons-solid:fire",
-        excerpt: "A deep learning framework implemented in Numpy...",
-        link: "https://github.com/Renovamen/flint"
+        id: "viz_ctpp",
+        title: "CTPP Hackathon",
+        file: "https://raw.githubusercontent.com/jinsanity07git/utbDoc/refs/heads/master/docs/en/README.md",
+        icon: "i-mdi:cloud-print-outline",
+        excerpt:
+          "A web-based demo for comparing the CTPP data across different states...",
+        link: "https://cheerup.us.kg/#/en/"
       },
       {
-        id: "portfolio-macos",
-        title: "Portfolio macOS",
-        file: "https://raw.githubusercontent.com/Renovamen/playground-macos/main/README.md",
+        id: "viz_sreport",
+        title: "Summary Report",
+        file: "markdown/projects/viz_sreport.md",
+        icon: "i-mdi:chart-tree",
+        excerpt:
+          "A standalone HTML file that provides a high-level summary of the TDM23 scenario...",
+        link: "https://ctps.org/pub/tdm23_sc/tdm23.1.0/Base_2050-Plan.html"
+      },
+      {
+        id: "viz_sankey",
+        title: "Macro Orchestration",
+        file: "markdown/projects/viz_sankey.md",
         icon: "i-ri:gamepad-line",
-        excerpt: "My portfolio website simulating macOS's GUI...",
-        link: "https://github.com/Renovamen/playground-macos"
+        excerpt: "A visual representation of call stack within the TDM23 Macros...",
+        link: "https://ctpsstaff.github.io/tdm23_users_guide/1.0/pages/more/tdm23_macros/"
       },
       {
-        id: "oh-my-cv",
-        title: "Oh, My CV!",
-        file: "https://raw.githubusercontent.com/Renovamen/oh-my-cv/main/README.md",
-        icon: "i-ri:newspaper-fill",
-        excerpt: "Write your curriculum vitae / resume in Markdown online...",
-        link: "https://ohmycv.app"
-      },
-      {
-        id: "oh-vue-icons",
-        title: "Oh, Vue Icons!",
-        file: "https://raw.githubusercontent.com/Renovamen/oh-vue-icons/master/README.md",
-        icon: "i-fa-brands:vuejs",
-        excerpt: "Importing icons from different icon packs in Vue easily...",
-        link: "https://oh-vue-icons.js.org"
-      },
-      {
-        id: "gungnir",
-        title: "Gungnir",
-        file: "https://raw.githubusercontent.com/Renovamen/vuepress-theme-gungnir/main/README.md",
-        icon: "i-akar-icons:sword",
-        excerpt: "A simple and beautiful blog theme for VuePress...",
-        link: "https://vuepress-theme-gungnir.vercel.app"
-      },
-      {
-        id: "metallic",
-        title: "Metallic",
-        file: "https://raw.githubusercontent.com/Renovamen/metallic/master/README.md",
-        icon: "i-icon-park-outline:heavy-metal",
-        excerpt: "A meta-learning library base on PyTorch...",
-        link: "https://github.com/Renovamen/metallic"
-      },
-      {
-        id: "text-classification",
-        title: "Text Classification",
-        file: "https://raw.githubusercontent.com/Renovamen/Text-Classification/master/README.md",
-        icon: "i-gg:format-text",
-        excerpt: "PyTorch implementation of text classificaiton models...",
-        link: "https://github.com/Renovamen/Text-Classification"
-      },
-      {
-        id: "speech-emotion-recognition",
-        title: "Speech Emotion",
-        file: "https://raw.githubusercontent.com/Renovamen/Speech-Emotion-Recognition/master/README.md",
-        icon: "i-ant-design:audio-filled",
-        excerpt: "Speech emotion recognition using Keras and sklearn...",
-        link: "https://github.com/Renovamen/Speech-Emotion-Recognition"
-      },
-      {
-        id: "pcalg-py",
-        title: "PC Algorithm",
-        file: "https://raw.githubusercontent.com/Renovamen/pcalg-py/master/README.md",
-        icon: "i-tabler:atom-2",
-        excerpt: "Implement PC algorithm in Python...",
-        link: "https://github.com/Renovamen/pcalg-py"
-      },
-      {
-        id: "midgard",
-        title: "Midgard",
-        file: "https://raw.githubusercontent.com/Renovamen/midgard/master/README.md",
-        icon: "i-bx:game",
-        excerpt: "An interactive version of my resume, powered by Vue...",
-        link: "https://resume.zxh.io/"
-      },
-      {
-        id: "image-captioning",
-        title: "Image Captioning",
-        file: "https://raw.githubusercontent.com/Renovamen/Image-Captioning/master/README.md",
-        icon: "i-bi:image-fill",
-        excerpt: "PyTorch implementation of image captioning models...",
-        link: "https://github.com/Renovamen/Image-Captioning"
-      },
-      {
-        id: "wordle-helper",
-        title: "Wordle Helper",
-        file: "https://raw.githubusercontent.com/Renovamen/wordle-helper/main/README.md",
-        icon: "i-bi:grid-1x2",
-        excerpt: "Help you solve Wordle puzzles...",
-        link: "https://wordle.zxh.io"
-      },
-      {
-        id: "cube-solver",
-        title: "Cube Solver",
-        file: "https://raw.githubusercontent.com/Renovamen/Just-a-Cube/master/README.md",
-        icon: "i-bx:cube",
-        excerpt: "A rubik's cube solver (layer-by-layer & two-phase)...",
-        link: "https://cube.zxh.io"
-      },
-      {
-        id: "alkaid",
-        title: "Alkaid",
-        file: "https://raw.githubusercontent.com/Renovamen/alkaid/main/README.md",
-        icon: "i-simple-icons:stellar",
-        excerpt: "Minimal reinforcement-learning toolbox for PyTorch...",
-        link: "https://github.com/Renovamen/alkaid"
-      },
-      {
-        id: "fishmail",
-        title: "Fishmail",
-        file: "https://raw.githubusercontent.com/Renovamen/Fishmail/master/README.md",
-        icon: "i-game-icons:fish-escape",
-        excerpt: "上班的时候装作在 Gmail 上查邮件的样子看知乎摸鱼...",
-        link: "https://fishmail.vercel.app"
+        id: "viz_parallel",
+        title: "DMDU Analysis",
+        file: "https://raw.githubusercontent.com/CTPSSTAFF/exp_model_trb25/refs/heads/main/README.md",
+        icon: "i-mdi:chart-bar-stacked",
+        excerpt: "A colab notebook of DMDU analysis...",
+        link: "https://github.com/CTPSSTAFF/exp_model_trb25"
       }
     ]
   }
