@@ -7,45 +7,27 @@ const websites: WebsitesData = {
       {
         id: "my-blog",
         title: "Website",
-        img: "https://zxh.me/img/astro.jpg",
-        link: "https://zxh.me/",
+        img: "https://jinsanity07git.github.io/UWMnotebook/src/svg/Mark_RGB_Yellow.svg",
+        link: "https://jinsanity07git.github.io/blog/",
         inner: true
       },
       {
         id: "my-github",
         title: "Github",
         img: "img/sites/github.svg",
-        link: "https://github.com/Renovamen"
+        link: "https://github.com/jinsanity07git"
       },
       {
         id: "my-linkedin",
         title: "Linkedin",
         img: "img/sites/linkedin.svg",
-        link: "https://www.linkedin.com/in/xiaohan-zou"
-      },
-      {
-        id: "my-google-scholar",
-        title: "Scholar",
-        img: "img/sites/google-scholar.svg",
-        link: "https://scholar.google.com/citations?user=RuW6xgMAAAAJ"
-      },
-      {
-        id: "my-zhihu",
-        title: "知乎",
-        img: "img/sites/zhihu.jpeg",
-        link: "https://www.zhihu.com/people/chao-neng-gui-su"
-      },
-      {
-        id: "my-twitter",
-        title: "Twitter",
-        img: "img/sites/twitter.svg",
-        link: "https://www.twitter.com/renovamen_zxh"
+        link: "https://www.linkedin.com/in/zihao-jin-131822102/"
       },
       {
         id: "my-email",
         title: "Email",
         img: "img/sites/gmail.svg",
-        link: "mailto:renovamenzxh@gmail.com"
+        link: "mailto:jinsanityff@gmail.com"
       }
     ]
   },
@@ -53,10 +35,10 @@ const websites: WebsitesData = {
     title: "Frequently Visited",
     sites: [
       {
-        id: "github",
-        title: "Github",
-        img: "img/sites/github.svg",
-        link: "https://github.com/"
+        id: "macos-icon-gallery",
+        title: "MacOS Icons",
+        img: "https://www.macosicongallery.com/favicon.ico",
+        link: "https://www.macosicongallery.com/"
       },
       {
         id: "arxiv",

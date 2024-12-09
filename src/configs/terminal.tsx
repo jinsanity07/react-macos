@@ -20,14 +20,13 @@ const terminal: TerminalData[] = [
         id: "about-interests",
         title: "interests.txt",
         type: "file",
-        content: "Machine Learning / Computer Vision / Multimodal Learning"
+        content: "Visualization / Cloud Computing / AI / Machine Learning"
       },
       {
         id: "about-who-cares",
         title: "who-cares.txt",
         type: "file",
-        content:
-          "I'm looking for a research internship for Summer 2024. I'm open to collaboration on research projects."
+        content: "I'm looking for a good traffic."
       },
       {
         id: "about-contact",
@@ -39,22 +38,22 @@ const terminal: TerminalData[] = [
               Email:{" "}
               <a
                 className="text-blue-300"
-                href="mailto:renovamenzxh@gmail.com"
+                href="mailto:jinsanityff@gmail.com"
                 target="_blank"
                 rel="noreferrer"
               >
-                renovamenzxh@gmail.com
+                jinsanityff@gmail.com
               </a>
             </li>
             <li>
               Github:{" "}
               <a
                 className="text-blue-300"
-                href="https://github.com/Renovamen"
+                href="https://github.com/jinsanity07git"
                 target="_blank"
                 rel="noreferrer"
               >
-                @Renovamen
+                @jinsanity07git
               </a>
             </li>
             <li>
@@ -71,33 +70,22 @@ const terminal: TerminalData[] = [
               Linkedin:{" "}
               <a
                 className="text-blue-300"
-                href="https://www.linkedin.com/in/xiaohan-zou"
+                href="https://www.linkedin.com/in/zihao-jin-131822102/"
                 target="_blank"
                 rel="noreferrer"
               >
-                xiaohan-zou
+                Zihao Jin
               </a>
             </li>
             <li>
               Personal Website:{" "}
               <a
                 className="text-blue-300"
-                href="https://zxh.me"
+                href="https://jinsanity07.github.io"
                 target="_blank"
                 rel="noreferrer"
               >
-                https://zxh.me
-              </a>
-            </li>
-            <li>
-              知乎:{" "}
-              <a
-                className="text-blue-300"
-                href="https://www.zhihu.com/people/chao-neng-gui-su"
-                target="_blank"
-                rel="noreferrer"
-              >
-                @西伯利亚大恶龙
+                https://jinsanity07.github.io
               </a>
             </li>
           </ul>

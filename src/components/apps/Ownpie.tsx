@@ -3,7 +3,7 @@ export default function ownpie() {
     <iframe
       className="size-full bg-[#202020]"
       // src="https://app.flowoss.com/"
-      src="https://tdm.us.kg/ownpie/"
+      src="https://tdm.us.kg/"
       title="ownpie"
     />
   );
