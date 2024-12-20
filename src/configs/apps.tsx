@@ -52,6 +52,17 @@ const apps: AppsData[] = [
     content: <Youtube />
   },
   {
+    id: "Book",
+    title: "Book",
+    desktop: true,
+    width: 1024,
+    height: 600,
+    x: 80,
+    y: -30,
+    img: "https://cdn.readest.com/images/readest-icon.png",
+    content: <Book />
+  },
+  {
     id: "ownpie",
     title: "Ownpie",
     desktop: true,
