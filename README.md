@@ -16,16 +16,17 @@ git commit -m "[feat] "
 ```
 
 ## Usage
-* download and install [node](https://nodejs.org/en/download/package-manager)
+* install [fnm](https://github.com/Schniz/fnm) and then use the pinned Node.js version from this repo
 ```bash
-fnm env
-fnm use v22.11.0
+fnm install
+fnm use
 node -v
 
-npm i -g pnpm
+corepack enable
+pnpm -v
 ```
 
-install pnpm as an npm package with $ npm i -g pnpm.  [link](https://blog.logrocket.com/javascript-package-managers-compared/)
+`fnm` is a fast Node.js version manager. It lets each project use its own Node version, so this workspace can stay on `v24.14.0` without affecting your global setup.
 
 Clone the repo and install dependencies:
 
