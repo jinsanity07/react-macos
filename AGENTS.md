@@ -21,6 +21,9 @@
 - Follow existing component and store patterns instead of introducing new architectural layers.
 - Keep UI changes aligned with the current macOS-inspired visual language unless the user asks for a redesign.
 - Update the README when setup or usage behavior changes.
+- For new top-bar plugin panels, reuse the existing floating-menu shell pattern from Control Center: fixed placement, `useClickOutside`, and a launcher button positioned alongside the other status icons.
+- If the feature embeds a remote page, prefer a direct iframe with no extra browser chrome unless the user explicitly asks for navigation controls.
+- Keep plugin panels visually consistent with the existing Control Center sizing, border, shadow, and spacing so they feel native to the app shell.
 
 ## Good Places To Check
 - Setup and usage details: [README.md](README.md)
