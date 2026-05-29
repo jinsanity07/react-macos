@@ -3,6 +3,7 @@ import { format } from "date-fns";
 import { isFullScreen } from "~/utils";
 import { music } from "~/configs";
 import type { MacActions } from "~/types";
+import UsageBoardMenu from "./UsageBoardMenu";
 
 interface TopBarItemProps {
   hideOnMobile?: boolean;
@@ -49,6 +50,20 @@ const CCMIcon = ({ size }: { size: number }) => {
   );
 };
 
+const UsageBoardIcon = ({ size }: { size: number }) => {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width={size}
+      height={size}
+      xmlns="http://www.w3.org/2000/svg"
+      fill="currentColor"
+    >
+      <path d="M4 5.5A1.5 1.5 0 0 1 5.5 4h13A1.5 1.5 0 0 1 20 5.5v13A1.5 1.5 0 0 1 18.5 20h-13A1.5 1.5 0 0 1 4 18.5v-13Zm1.5.5v12h13V6h-13Zm2 2h2v2h-2V8Zm0 3h2v2h-2v-2Zm0 3h2v2h-2v-2Zm4-6h5v2h-5V8Zm0 3h5v2h-5v-2Zm0 3h5v2h-5v-2Z" />
+    </svg>
+  );
+};
+
 interface TopBarProps extends MacActions {
   title: string;
   setSpotlightBtnRef: (value: React.RefObject<HTMLDivElement>) => void;
@@ -59,12 +74,14 @@ interface TopBarProps extends MacActions {
 interface TopBarState {
   date: Date;
   showControlCenter: boolean;
+  showUsageBoard: boolean;
   showWifiMenu: boolean;
   showAppleMenu: boolean;
 }
 
 const TopBar = (props: TopBarProps) => {
   const appleBtnRef = useRef<HTMLDivElement>(null);
+  const usageBoardBtnRef = useRef<HTMLDivElement>(null);
   const controlCenterBtnRef = useRef<HTMLDivElement>(null);
   const wifiBtnRef = useRef<HTMLDivElement>(null);
   const spotlightBtnRef = useRef<HTMLDivElement>(null);
@@ -72,6 +89,7 @@ const TopBar = (props: TopBarProps) => {
   const [state, setState] = useState<TopBarState>({
     date: new Date(),
     showControlCenter: false,
+    showUsageBoard: false,
     showWifiMenu: false,
     showAppleMenu: false
   });
@@ -123,6 +141,13 @@ const TopBar = (props: TopBarProps) => {
     setState({
       ...state,
       showControlCenter: !state.showControlCenter
+    });
+  };
+
+  const toggleUsageBoard = (): void => {
+    setState({
+      ...state,
+      showUsageBoard: !state.showUsageBoard
     });
   };
 
@@ -217,6 +242,13 @@ const TopBar = (props: TopBarProps) => {
           <span className="i-bx:search text-[17px]" />
         </TopBarItem>
         <TopBarItem
+          forceHover={state.showUsageBoard}
+          onClick={toggleUsageBoard}
+          ref={usageBoardBtnRef}
+        >
+          <UsageBoardIcon size={16} />
+        </TopBarItem>
+        <TopBarItem
           forceHover={state.showControlCenter}
           onClick={toggleControlCenter}
           ref={controlCenterBtnRef}
@@ -239,6 +271,10 @@ const TopBar = (props: TopBarProps) => {
             toggleControlCenter={toggleControlCenter}
             btnRef={controlCenterBtnRef}
           />
+        )}
+
+        {state.showUsageBoard && (
+          <UsageBoardMenu toggleUsageBoard={toggleUsageBoard} btnRef={usageBoardBtnRef} />
         )}
 
         <TopBarItem>

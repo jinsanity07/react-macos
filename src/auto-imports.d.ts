@@ -23,6 +23,7 @@ declare global {
   const Terminal: typeof import('./components/apps/Terminal')['default']
   const TopBar: typeof import('./components/menus/TopBar')['default']
   const Typora: typeof import('./components/apps/Typora')['default']
+  const UsageBoardMenu: typeof import('./components/menus/UsageBoardMenu')['default']
   const VSCode: typeof import('./components/apps/VSCode')['default']
   const WifiMenu: typeof import('./components/menus/WifiMenu')['default']
   const Window: typeof import('./components/Window')['default']
