@@ -2,10 +2,8 @@ name: build-and-deploy
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-
+    branches: [ jinsanity ]
+  workflow_dispatch:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
