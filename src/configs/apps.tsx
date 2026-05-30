@@ -70,7 +70,7 @@ const apps: AppsData[] = [
     height: 600,
     x: 80,
     y: -30,
-    img: "sicons/sunrise-calendar.avif",
+    img: "img/icons/sunrise-calendar.avif",
     content: <Ownpie />
   },
   {
