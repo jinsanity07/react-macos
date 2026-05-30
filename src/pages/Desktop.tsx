@@ -3,6 +3,7 @@ import { apps, wallpapers } from "~/configs";
 import { minMarginY } from "~/utils";
 import type { MacActions } from "~/types";
 import AboutThisMac from "~/components/AboutThisMac";
+import type { SpotlightHandle } from "~/components/Spotlight";
 
 interface DesktopState {
   showApps: {
@@ -41,6 +42,8 @@ export default function Desktop(props: MacActions) {
 
   const [spotlightBtnRef, setSpotlightBtnRef] =
     useState<React.RefObject<HTMLDivElement> | null>(null);
+  const spotlightRef = useRef<SpotlightHandle | null>(null);
+  const spotlightOpenRef = useRef(false);
 
   const { dark, brightness } = useStore((state) => ({
     dark: state.dark,
@@ -77,6 +80,44 @@ export default function Desktop(props: MacActions) {
 
   useEffect(() => {
     getAppsData();
+  }, []);
+
+  useEffect(() => {
+    spotlightOpenRef.current = state.spotlight;
+  }, [state.spotlight]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const isPrimarySpotlightHotkey =
+        event.ctrlKey &&
+        !event.shiftKey &&
+        event.code === "Space" &&
+        !event.altKey &&
+        !event.metaKey;
+      const isFallbackSpotlightHotkey =
+        event.ctrlKey &&
+        event.shiftKey &&
+        event.code === "Space" &&
+        !event.altKey &&
+        !event.metaKey;
+
+      if (!isPrimarySpotlightHotkey && !isFallbackSpotlightHotkey) return;
+
+      event.preventDefault();
+
+      if (spotlightOpenRef.current) {
+        spotlightRef.current?.focusSearch();
+        return;
+      }
+
+      setState((prev) => ({
+        ...prev,
+        spotlight: true
+      }));
+    };
+
+    window.addEventListener("keydown", handleKeyDown, true);
+    return () => window.removeEventListener("keydown", handleKeyDown, true);
   }, []);
 
   const toggleLaunchpad = (target: boolean): void => {
@@ -273,6 +314,7 @@ export default function Desktop(props: MacActions) {
       {/* Spotlight */}
       {state.spotlight && (
         <Spotlight
+          ref={spotlightRef}
           openApp={openApp}
           toggleLaunchpad={toggleLaunchpad}
           toggleSpotlight={toggleSpotlight}
