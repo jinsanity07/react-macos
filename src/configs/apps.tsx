@@ -70,7 +70,7 @@ const apps: AppsData[] = [
     height: 600,
     x: 80,
     y: -30,
-    img: "img/icons/sunrise-calendar.avif",
+    img: "sicons/sunrise-calendar.avif",
     content: <Ownpie />
   },
   {
@@ -110,7 +110,7 @@ const apps: AppsData[] = [
     title: "Github",
     desktop: false,
     img: "img/icons/github.png",
-    link: "https://github.com/jinsanity07git"
+    link: "https://github.com/codespace"
   }
 ];
 

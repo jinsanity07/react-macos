@@ -49,7 +49,7 @@ const launchpadApps: LaunchpadData[] = [
   {
     id: "silverai",
     title: "Silver.ai",
-    img: "dist/img/icons/launchpad/cube.png",
+    img: "img/icons/launchpad/cube.png",
     link: "https://amz.mkpie.me/silverai/"
   },
   {
