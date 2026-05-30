@@ -4,6 +4,7 @@ import { isFullScreen } from "~/utils";
 import { music } from "~/configs";
 import type { MacActions } from "~/types";
 import UsageBoardMenu from "./UsageBoardMenu";
+import SanityMenu from "./SanityMenu";
 
 interface TopBarItemProps {
   hideOnMobile?: boolean;
@@ -76,6 +77,7 @@ interface TopBarState {
   date: Date;
   showControlCenter: boolean;
   showUsageBoard: boolean;
+  showSanityMenu: boolean;
   showWifiMenu: boolean;
   showAppleMenu: boolean;
 }
@@ -86,11 +88,13 @@ const TopBar = (props: TopBarProps) => {
   const controlCenterBtnRef = useRef<HTMLDivElement>(null);
   const wifiBtnRef = useRef<HTMLDivElement>(null);
   const spotlightBtnRef = useRef<HTMLDivElement>(null);
+  const sanityBtnRef = useRef<HTMLDivElement>(null);
 
   const [state, setState] = useState<TopBarState>({
     date: new Date(),
     showControlCenter: false,
     showUsageBoard: false,
+    showSanityMenu: false,
     showWifiMenu: false,
     showAppleMenu: false
   });
@@ -149,6 +153,13 @@ const TopBar = (props: TopBarProps) => {
     setState({
       ...state,
       showUsageBoard: !state.showUsageBoard
+    });
+  };
+
+  const toggleSanityMenu = (): void => {
+    setState({
+      ...state,
+      showSanityMenu: !state.showSanityMenu
     });
   };
 
@@ -285,7 +296,15 @@ const TopBar = (props: TopBarProps) => {
           <UsageBoardMenu toggleUsageBoard={toggleUsageBoard} btnRef={usageBoardBtnRef} />
         )}
 
-        <TopBarItem>
+        {state.showSanityMenu && (
+          <SanityMenu toggleSanityMenu={toggleSanityMenu} btnRef={sanityBtnRef} />
+        )}
+
+        <TopBarItem
+          forceHover={state.showSanityMenu}
+          onClick={toggleSanityMenu}
+          ref={sanityBtnRef}
+        >
           <span>{format(state.date, "eee MMM d")}</span>
           <span>{format(state.date, "h:mm aa")}</span>
         </TopBarItem>

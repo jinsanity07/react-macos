@@ -21,6 +21,7 @@ declare global {
   const MenuItemGroup: typeof import('./components/menus/base')['MenuItemGroup']
   const Ownpie: typeof import('./components/apps/Ownpie')['default']
   const Safari: typeof import('./components/apps/Safari')['default']
+  const SanityMenu: typeof import('./components/menus/SanityMenu')['default']
   const Spotlight: typeof import('./components/Spotlight')['default']
   const SwitchUser: typeof import('./components/SwitchUser')['default']
   const Terminal: typeof import('./components/apps/Terminal')['default']
