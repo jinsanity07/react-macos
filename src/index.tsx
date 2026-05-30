@@ -4,11 +4,25 @@ import { createRoot } from "react-dom/client";
 import Desktop from "~/pages/Desktop";
 import Login from "~/pages/Login";
 import Boot from "~/pages/Boot";
+import {
+  applyDocumentTheme,
+  getPreferredDarkTheme,
+  watchPreferredDarkTheme
+} from "~/utils";
+import { useStore } from "~/stores";
 
 import "@unocss/reset/tailwind.css";
 import "uno.css";
 import "katex/dist/katex.min.css";
 import "~/styles/index.css";
+
+const preferredDark = getPreferredDarkTheme();
+applyDocumentTheme(preferredDark);
+useStore.setState({ dark: preferredDark });
+watchPreferredDarkTheme((dark) => {
+  applyDocumentTheme(dark);
+  useStore.setState({ dark });
+});
 
 export default function App() {
   const [login, setLogin] = useState<boolean>(false);

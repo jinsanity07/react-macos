@@ -1,5 +1,6 @@
 import type { StateCreator } from "zustand";
 import { enterFullScreen, exitFullScreen } from "~/utils";
+import { applyDocumentTheme, getPreferredDarkTheme } from "~/utils";
 
 export interface SystemSlice {
   dark: boolean;
@@ -19,7 +20,7 @@ export interface SystemSlice {
 }
 
 export const createSystemSlice: StateCreator<SystemSlice> = (set) => ({
-  dark: true,
+  dark: getPreferredDarkTheme(),
   volume: 100,
   brightness: 80,
   wifi: true,
@@ -28,9 +29,9 @@ export const createSystemSlice: StateCreator<SystemSlice> = (set) => ({
   fullscreen: false,
   toggleDark: () =>
     set((state) => {
-      if (!state.dark) document.documentElement.classList.add("dark");
-      else document.documentElement.classList.remove("dark");
-      return { dark: !state.dark };
+      const nextDark = !state.dark;
+      applyDocumentTheme(nextDark);
+      return { dark: nextDark };
     }),
   toggleWIFI: () => set((state) => ({ wifi: !state.wifi })),
   toggleBluetooth: () => set((state) => ({ bluetooth: !state.bluetooth })),
