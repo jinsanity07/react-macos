@@ -11,18 +11,18 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      NODE_VERSION: 20
+      NODE_VERSION: 24
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v5
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
@@ -33,9 +33,29 @@ jobs:
       - name: Build site
         run: pnpm build
 
-      - name: Deploy
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: dist
-          cname: portfolio.zxh.me
+      - name: Publish to external Pages repo
+        env:
+          TARGET_REPO_PAT: ${{ secrets.TARGET_REPO_PAT }}
+        run: |
+          set -euo pipefail
+
+          git clone "https://x-access-token:${TARGET_REPO_PAT}@github.com/jinsanity07/jinsanity07.github.io.git" target-repo
+
+          rm -rf target-repo/docs
+          unzip -q docs.zip -d target-repo
+          mv target-repo/dist target-repo/docs
+
+          # optional for SPA/static hosting behavior
+          touch target-repo/docs/.nojekyll
+
+          git -C target-repo config user.name "github-actions[bot]"
+          git -C target-repo config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C target-repo add docs
+
+          if git -C target-repo diff --cached --quiet; then
+            echo "No changes to publish"
+            exit 0
+          fi
+
+          git -C target-repo commit -m "Deploy from ${GITHUB_REPOSITORY}@${GITHUB_SHA}"
+          git -C target-repo push origin main
