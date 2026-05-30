@@ -2,6 +2,7 @@ import React from "react";
 import { apps, wallpapers } from "~/configs";
 import { minMarginY } from "~/utils";
 import type { MacActions } from "~/types";
+import AboutThisMac from "~/components/AboutThisMac";
 
 interface DesktopState {
   showApps: {
@@ -21,6 +22,7 @@ interface DesktopState {
   currentTitle: string;
   hideDockAndTopbar: boolean;
   spotlight: boolean;
+  aboutThisMac: boolean;
 }
 
 export default function Desktop(props: MacActions) {
@@ -33,7 +35,8 @@ export default function Desktop(props: MacActions) {
     showLaunchpad: false,
     currentTitle: "Finder",
     hideDockAndTopbar: false,
-    spotlight: false
+    spotlight: false,
+    aboutThisMac: false
   } as DesktopState);
 
   const [spotlightBtnRef, setSpotlightBtnRef] =
@@ -91,6 +94,10 @@ export default function Desktop(props: MacActions) {
 
   const toggleSpotlight = (): void => {
     setState({ ...state, spotlight: !state.spotlight });
+  };
+
+  const toggleAboutThisMac = (): void => {
+    setState({ ...state, aboutThisMac: !state.aboutThisMac });
   };
 
   const setWindowPosition = (id: string): void => {
@@ -251,9 +258,12 @@ export default function Desktop(props: MacActions) {
         sleepMac={props.sleepMac}
         restartMac={props.restartMac}
         toggleSpotlight={toggleSpotlight}
+        toggleAboutThisMac={toggleAboutThisMac}
         hide={state.hideDockAndTopbar}
         setSpotlightBtnRef={setSpotlightBtnRef}
       />
+
+      {state.aboutThisMac && <AboutThisMac onClose={toggleAboutThisMac} />}
 
       {/* Desktop Apps */}
       <div className="window-bound z-10 absolute" style={{ top: minMarginY }}>

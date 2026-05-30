@@ -69,6 +69,7 @@ interface TopBarProps extends MacActions {
   setSpotlightBtnRef: (value: React.RefObject<HTMLDivElement>) => void;
   hide: boolean;
   toggleSpotlight: () => void;
+  toggleAboutThisMac: () => void;
 }
 
 interface TopBarState {
@@ -158,6 +159,11 @@ const TopBar = (props: TopBarProps) => {
     });
   };
 
+  const openAboutThisMac = (): void => {
+    if (state.showAppleMenu) toggleAppleMenu();
+    props.toggleAboutThisMac();
+  };
+
   const toggleWifiMenu = (): void => {
     setState({
       ...state,
@@ -217,6 +223,7 @@ const TopBar = (props: TopBarProps) => {
           shut={shut}
           restart={restart}
           sleep={sleep}
+          aboutThisMac={openAboutThisMac}
           toggleAppleMenu={toggleAppleMenu}
           btnRef={appleBtnRef}
         />

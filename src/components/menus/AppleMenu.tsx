@@ -5,6 +5,7 @@ interface AppleMenuProps {
   shut: (e: React.MouseEvent<HTMLLIElement>) => void;
   restart: (e: React.MouseEvent<HTMLLIElement>) => void;
   sleep: (e: React.MouseEvent<HTMLLIElement>) => void;
+  aboutThisMac: () => void;
   toggleAppleMenu: () => void;
   btnRef: React.RefObject<HTMLDivElement>;
 }
@@ -14,6 +15,7 @@ export default function AppleMenu({
   shut,
   restart,
   sleep,
+  aboutThisMac,
   toggleAppleMenu,
   btnRef
 }: AppleMenuProps) {
@@ -24,7 +26,7 @@ export default function AppleMenu({
   return (
     <div className="menu-box left-2 w-56" ref={ref}>
       <MenuItemGroup>
-        <MenuItem>About This Mac</MenuItem>
+        <MenuItem onClick={aboutThisMac}>About This Mac</MenuItem>
       </MenuItemGroup>
       <MenuItemGroup>
         <MenuItem>System Preferences...</MenuItem>
