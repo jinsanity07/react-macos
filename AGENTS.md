@@ -25,6 +25,19 @@
 - If the feature embeds a remote page, prefer a direct iframe with no extra browser chrome unless the user explicitly asks for navigation controls.
 - Keep plugin panels visually consistent with the existing Control Center sizing, border, shadow, and spacing so they feel native to the app shell.
 
+## Hotkey Practice
+- Treat browser hotkeys as in-page shortcuts, not host-level overrides. A global OS shortcut or another app may still win.
+- Use capture-phase listeners on `window` when the active page should prioritize a shortcut, and call `preventDefault()` only for the exact chord you own.
+- Provide a fallback chord for common conflicts, and prefer a focused imperative API such as `focusSearch()` when a panel is already open.
+- Keep hotkeys configurable or easily swappable when they compete with common system bindings like `Ctrl+Space`.
+
+## Multi-User Login Practice
+- Keep the guest login path intact; do not repurpose it when adding switch-user auth.
+- Treat remote login responses as a contract: only JSON `{ ok: true }` counts as success.
+- Prefer the server-returned `username` for UI state after login, and keep the active user name/avatar in app-level state so menus and labels stay in sync.
+- When using cross-origin login, require `credentials: "include"` and rely on the server to set the session cookie with the proper CORS and `Set-Cookie` headers.
+- Do not assume HTML redirects or any `2xx` response means authenticated success.
+
 ## Embedding Remote Pages — Caution & Best Practices
 
 - **Caution:** Many external sites intentionally block framing (via `X-Frame-Options` or `Content-Security-Policy`) or require authentication. Do not attempt to bypass those protections with unauthorized proxies or header-stripping — only proceed if you own the target service or have explicit permission.
