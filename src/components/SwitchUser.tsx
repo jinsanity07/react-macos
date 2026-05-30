@@ -47,7 +47,14 @@ export default function SwitchUser({ open, onClose, onSuccess }: Props) {
         !!data && typeof data === "object" && (data as { ok?: unknown }).ok === true;
 
       if (isSuccess) {
-        onSuccess(username);
+        const serverUsername =
+          typeof data === "object" &&
+          data !== null &&
+          typeof (data as { username?: unknown }).username === "string"
+            ? (data as { username: string }).username
+            : username;
+
+        onSuccess(serverUsername);
         onClose();
       } else {
         setError(`Login failed (${res.status})`);

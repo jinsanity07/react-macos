@@ -110,7 +110,7 @@ const apps: AppsData[] = [
     title: "Github",
     desktop: false,
     img: "img/icons/github.png",
-    link: "https://github.com/codespace"
+    link: "https://github.com/codespaces"
   }
 ];
 

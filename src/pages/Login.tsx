@@ -30,16 +30,8 @@ export default function Login(props: MacActions) {
   };
 
   function onSwitchSuccess(username: string) {
-    // set current user to the authenticated username; avoid storing password locally
-    try {
-      (props as any).setCurrentUser({
-        name: username,
-        avatar: user.avatar,
-        password: ""
-      });
-    } catch (e) {
-      /* ignore */
-    }
+    props.setCurrentUserName?.(username);
+    props.setCurrentUserAvatar?.("img/ui/avatar.jpg");
     props.setLogin(true);
   }
 
@@ -58,10 +50,12 @@ export default function Login(props: MacActions) {
           {/* Avatar */}
           <img
             className="rounded-full size-24 my-0 mx-auto"
-            src={user.avatar}
+            src={props.currentUserAvatar || user.avatar}
             alt="img"
           />
-          <div className="font-semibold mt-2 text-xl text-white">{user.name}</div>
+          <div className="font-semibold mt-2 text-xl text-white">
+            {props.currentUserName || user.name}
+          </div>
 
           {/* Password Input */}
           <div className="mx-auto grid grid-cols-5 w-44 h-8 mt-4 rounded-md backdrop-blur-2xl bg-gray-300/50">

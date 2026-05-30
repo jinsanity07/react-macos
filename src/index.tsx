@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { createRoot } from "react-dom/client";
 
 import Desktop from "~/pages/Desktop";
 import Login from "~/pages/Login";
 import Boot from "~/pages/Boot";
+import { user } from "~/configs";
 import {
   applyDocumentTheme,
   getPreferredDarkTheme,
@@ -26,6 +27,8 @@ watchPreferredDarkTheme((dark) => {
 
 export default function App() {
   const [login, setLogin] = useState<boolean>(false);
+  const [currentUserName, setCurrentUserName] = useState<string>("jinsanity");
+  const [currentUserAvatar, setCurrentUserAvatar] = useState<string>(user.avatar);
   const [booting, setBooting] = useState<boolean>(false);
   const [restart, setRestart] = useState<boolean>(false);
   const [sleep, setSleep] = useState<boolean>(false);
@@ -60,6 +63,8 @@ export default function App() {
     return (
       <Desktop
         setLogin={setLogin}
+        currentUserName={currentUserName}
+        currentUserAvatar={currentUserAvatar}
         shutMac={shutMac}
         sleepMac={sleepMac}
         restartMac={restartMac}
@@ -69,6 +74,10 @@ export default function App() {
     return (
       <Login
         setLogin={setLogin}
+        currentUserName={currentUserName}
+        currentUserAvatar={currentUserAvatar}
+        setCurrentUserName={setCurrentUserName}
+        setCurrentUserAvatar={setCurrentUserAvatar}
         shutMac={shutMac}
         sleepMac={sleepMac}
         restartMac={restartMac}

@@ -8,6 +8,7 @@ interface AppleMenuProps {
   aboutThisMac: () => void;
   toggleAppleMenu: () => void;
   btnRef: React.RefObject<HTMLDivElement>;
+  currentUserName?: string;
 }
 
 export default function AppleMenu({
@@ -17,7 +18,8 @@ export default function AppleMenu({
   sleep,
   aboutThisMac,
   toggleAppleMenu,
-  btnRef
+  btnRef,
+  currentUserName
 }: AppleMenuProps) {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -45,7 +47,7 @@ export default function AppleMenu({
       </MenuItemGroup>
       <MenuItemGroup border={false}>
         <MenuItem onClick={logout}>Lock Screen</MenuItem>
-        <MenuItem onClick={logout}>Log Out jinsanity...</MenuItem>
+        <MenuItem onClick={logout}>Log Out {currentUserName || "jinsanity"}...</MenuItem>
       </MenuItemGroup>
     </div>
   );

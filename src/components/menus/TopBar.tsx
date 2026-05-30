@@ -226,6 +226,7 @@ const TopBar = (props: TopBarProps) => {
           aboutThisMac={openAboutThisMac}
           toggleAppleMenu={toggleAppleMenu}
           btnRef={appleBtnRef}
+          currentUserName={props.currentUserName}
         />
       )}
 
