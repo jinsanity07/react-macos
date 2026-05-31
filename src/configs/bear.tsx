@@ -77,6 +77,21 @@ const bear: BearData[] = [
         link: "https://github.com/CTPSSTAFF/exp_model_trb25"
       }
     ]
+  },
+  {
+    id: "blogs",
+    title: "Blogs",
+    icon: "i-material-symbols:rss-feed-rounded",
+    md: [
+      {
+        id: "blogs-loading",
+        title: "Loading Blogs",
+        file: "",
+        icon: "i-eos-icons:three-dots-loading",
+        excerpt: "Fetching latest posts from RSS feed...",
+        content: "## Loading Blogs\n\nFetching latest posts from RSS feed..."
+      }
+    ]
   }
 ];
 

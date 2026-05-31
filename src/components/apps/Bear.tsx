@@ -6,20 +6,23 @@ import rehypeExternalLinks from "rehype-external-links";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { dracula, prism } from "react-syntax-highlighter/dist/esm/styles/prism";
 import bear from "~/configs/bear";
-import type { BearMdData } from "~/types";
+import { useBearBlogs } from "~/hooks";
+import type { BearData, BearMdData } from "~/types";
 
 interface ContentProps {
   contentID: string;
   contentURL: string;
+  contentMd?: string;
 }
 
 interface MiddlebarProps {
   items: BearMdData[];
   cur: number;
-  setContent: (id: string, url: string, index: number) => void;
+  setContent: (item: BearMdData, index: number) => void;
 }
 
 interface SidebarProps {
+  items: BearData[];
   cur: number;
   setMidBar: (items: BearMdData[], index: number) => void;
 }
@@ -57,7 +60,7 @@ const Highlighter = (dark: boolean): any => {
   };
 };
 
-const Sidebar = ({ cur, setMidBar }: SidebarProps) => {
+const Sidebar = ({ items, cur, setMidBar }: SidebarProps) => {
   return (
     <div text-white>
       <div className="h-12 pr-3 hstack space-x-3 justify-end">
@@ -65,7 +68,7 @@ const Sidebar = ({ cur, setMidBar }: SidebarProps) => {
         <span className="i-akar-icons:settings-vertical text-xl" />
       </div>
       <ul>
-        {bear.map((item, index) => (
+        {items.map((item, index) => (
           <li
             key={`bear-sidebar-${item.id}`}
             className={`pl-6 h-8 hstack cursor-default ${
@@ -83,38 +86,50 @@ const Sidebar = ({ cur, setMidBar }: SidebarProps) => {
 };
 
 const Middlebar = ({ items, cur, setContent }: MiddlebarProps) => {
+  const dark = useStore((state) => state.dark);
+
   return (
     <ul>
       {items.map((item: BearMdData, index: number) => (
         <li
           key={`bear-midbar-${item.id}`}
-          className={`h-24 flex flex-col cursor-default border-l-2 ${
+          className={`min-h-[48px] flex flex-col justify-center cursor-default border-l-2 px-3 py-2 ${
             cur === index
               ? "border-red-500 bg-white dark:bg-gray-900"
               : "border-transparent bg-transparent"
           } hover:(bg-white dark:bg-gray-900)`}
-          onClick={() => setContent(item.id, item.file, index)}
+          onClick={() => setContent(item, index)}
         >
-          <div className="h-8 mt-3 hstack">
-            <div className="-mt-1 w-10 vstack text-c-500">
+          <div className="flex items-center w-full">
+            <div className="w-8 vstack text-c-500 flex-shrink-0">
               <span className={item.icon} />
             </div>
-            <span className="relative flex-1 font-bold" text="gray-900 dark:gray-100">
-              {item.title}
-              {item.link && (
-                <a
-                  pos="absolute top-1 right-4"
-                  href={item.link}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  <span className="i-ant-design:link-outlined text-c-500" />
-                </a>
-              )}
-            </span>
-          </div>
-          <div className="flex-1 ml-10" p="b-2 r-1" text="sm c-500" border="b c-300">
-            {item.excerpt}
+            <div className="flex-1 min-w-0 ml-2">
+              <div
+                className={`truncate font-medium ${
+                  dark ? "text-gray-100" : "text-gray-900"
+                }`}
+                title={item.title}
+              >
+                {item.title}
+              </div>
+              <div
+                className="hidden md:block text-sm text-c-500 mt-1"
+                style={{
+                  display: "-webkit-box",
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: "vertical",
+                  overflow: "hidden"
+                }}
+              >
+                {item.excerpt}
+              </div>
+            </div>
+            {item.link && (
+              <a href={item.link} target="_blank" rel="noreferrer" className="ml-2">
+                <span className="i-ant-design:link-outlined text-c-500" />
+              </a>
+            )}
           </div>
         </li>
       ))}
@@ -148,12 +163,13 @@ const fixImageURL = (text: string, contentURL: string): string => {
   return text;
 };
 
-const Content = ({ contentID, contentURL }: ContentProps) => {
+const Content = ({ contentID, contentURL, contentMd }: ContentProps) => {
   const [storeMd, setStoreMd] = useState<{ [key: string]: string }>({});
   const dark = useStore((state) => state.dark);
 
   const fetchMarkdown = useCallback(
     (id: string, url: string) => {
+      if (!url) return;
       if (!storeMd[id]) {
         fetch(url)
           .then((response) => response.text())
@@ -168,8 +184,9 @@ const Content = ({ contentID, contentURL }: ContentProps) => {
   );
 
   useEffect(() => {
+    if (contentMd !== undefined) return;
     fetchMarkdown(contentID, contentURL);
-  }, [contentID, contentURL, fetchMarkdown]);
+  }, [contentID, contentURL, contentMd, fetchMarkdown]);
 
   return (
     <div className="markdown w-2/3 mx-auto px-2 py-6 text-c-700">
@@ -181,44 +198,145 @@ const Content = ({ contentID, contentURL }: ContentProps) => {
         ]}
         components={Highlighter(dark as boolean)}
       >
-        {storeMd[contentID]}
+        {contentMd ?? storeMd[contentID]}
       </ReactMarkdown>
     </div>
   );
 };
 
 const Bear = () => {
-  const [state, setState] = useState<BearState>({
-    curSidebar: 0,
-    curMidbar: 0,
-    midbarList: bear[0].md,
-    contentID: bear[0].md[0].id,
-    contentURL: bear[0].md[0].file
+  const { blogs, loading: blogsLoading, error: blogsError } = useBearBlogs();
+
+  const blogItems = useMemo<BearMdData[]>(() => {
+    if (blogsLoading) {
+      return [
+        {
+          id: "blogs-loading",
+          title: "Loading Blogs",
+          file: "",
+          icon: "i-eos-icons:three-dots-loading",
+          excerpt: "Fetching latest posts from RSS feed...",
+          content: "## Loading Blogs\n\nFetching latest posts from RSS feed..."
+        }
+      ];
+    }
+
+    if (blogsError) {
+      return [
+        {
+          id: "blogs-error",
+          title: "Blogs Unavailable",
+          file: "",
+          icon: "i-material-symbols:error-outline-rounded",
+          excerpt: "Could not load RSS feed. Please try again later.",
+          content: `## Blogs Unavailable\n\n${blogsError}`
+        }
+      ];
+    }
+
+    if (!blogs.length) {
+      return [
+        {
+          id: "blogs-empty",
+          title: "No Blogs Found",
+          file: "",
+          icon: "i-material-symbols:rss-feed-rounded",
+          excerpt: "No articles are currently available in the RSS feed.",
+          content:
+            "## No Blogs Found\n\nNo articles are currently available in the RSS feed."
+        }
+      ];
+    }
+
+    return blogs;
+  }, [blogs, blogsError, blogsLoading]);
+
+  const sidebarItems = useMemo<BearData[]>(() => {
+    return bear.map((item) =>
+      item.id === "blogs"
+        ? {
+            ...item,
+            md: blogItems
+          }
+        : item
+    );
+  }, [blogItems]);
+
+  const [state, setState] = useState<BearState>(() => {
+    const firstItem = sidebarItems[0].md[0];
+    return {
+      curSidebar: 0,
+      curMidbar: 0,
+      midbarList: sidebarItems[0].md,
+      contentID: firstItem.id,
+      contentURL: firstItem.file,
+      contentMd: firstItem.content
+    };
   });
 
+  useEffect(() => {
+    setState((prev) => {
+      const nextSidebarIndex = Math.min(prev.curSidebar, sidebarItems.length - 1);
+      const nextSidebarItem = sidebarItems[nextSidebarIndex];
+      const currentMidbarIndex = nextSidebarItem.md.findIndex(
+        (item) => item.id === prev.contentID
+      );
+      const nextMidbarIndex = currentMidbarIndex >= 0 ? currentMidbarIndex : 0;
+      const nextContentItem = nextSidebarItem.md[nextMidbarIndex];
+
+      if (!nextContentItem) return prev;
+
+      const unchanged =
+        prev.curSidebar === nextSidebarIndex &&
+        prev.curMidbar === nextMidbarIndex &&
+        prev.midbarList === nextSidebarItem.md &&
+        prev.contentID === nextContentItem.id &&
+        prev.contentURL === nextContentItem.file &&
+        prev.contentMd === nextContentItem.content;
+
+      if (unchanged) return prev;
+
+      return {
+        ...prev,
+        curSidebar: nextSidebarIndex,
+        curMidbar: nextMidbarIndex,
+        midbarList: nextSidebarItem.md,
+        contentID: nextContentItem.id,
+        contentURL: nextContentItem.file,
+        contentMd: nextContentItem.content
+      };
+    });
+  }, [sidebarItems]);
+
   const setMidBar = (items: BearMdData[], index: number) => {
-    setState({
+    const first = items[0];
+    if (!first) return;
+
+    setState((prev) => ({
+      ...prev,
       curSidebar: index,
       curMidbar: 0,
       midbarList: items,
-      contentID: items[0].id,
-      contentURL: items[0].file
-    });
+      contentID: first.id,
+      contentURL: first.file,
+      contentMd: first.content
+    }));
   };
 
-  const setContent = (id: string, url: string, index: number) => {
-    setState({
-      ...state,
+  const setContent = (item: BearMdData, index: number) => {
+    setState((prev) => ({
+      ...prev,
       curMidbar: index,
-      contentID: id,
-      contentURL: url
-    });
+      contentID: item.id,
+      contentURL: item.file,
+      contentMd: item.content
+    }));
   };
 
   return (
     <div className="bear font-avenir flex h-full">
       <div className="w-44 overflow-auto bg-gray-700">
-        <Sidebar cur={state.curSidebar} setMidBar={setMidBar} />
+        <Sidebar items={sidebarItems} cur={state.curSidebar} setMidBar={setMidBar} />
       </div>
       <div className="w-60 overflow-auto" bg="gray-50 dark:gray-800" border="r c-300">
         <Middlebar
@@ -228,7 +346,11 @@ const Bear = () => {
         />
       </div>
       <div className="flex-1 overflow-auto" bg="gray-50 dark:gray-800">
-        <Content contentID={state.contentID} contentURL={state.contentURL} />
+        <Content
+          contentID={state.contentID}
+          contentURL={state.contentURL}
+          contentMd={state.contentMd}
+        />
       </div>
     </div>
   );

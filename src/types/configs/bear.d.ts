@@ -5,6 +5,7 @@ export interface BearMdData {
   icon: string;
   excerpt: string;
   link?: string;
+  content?: string;
 }
 
 export interface BearData {

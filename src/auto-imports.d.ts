@@ -40,6 +40,7 @@ declare global {
   const startTransition: typeof import('react')['startTransition']
   const useAudio: typeof import('./hooks/useAudio')['useAudio']
   const useBattery: typeof import('./hooks/useBattery')['useBattery']
+  const useBearBlogs: typeof import('./hooks/useBearBlogs')['useBearBlogs']
   const useCallback: typeof import('react')['useCallback']
   const useClickOutside: typeof import('./hooks/useClickOutside')['useClickOutside']
   const useContext: typeof import('react')['useContext']
