@@ -47,6 +47,18 @@
 - **Alternative UX:** When full embedding isn't possible, consider using panel image renders, snapshots, or opening the dashboard in a new tab/window to preserve functionality without breaking security.
 - **UI guideline:** Non-embeddable or external-link apps should not be shown as Dock desktop apps. Prefer placing them in Launchpad or marking them clearly as external links so users understand they open in a browser.
 
+## Dynamic Utility Apps (Launchpad + Spotlight + Desktop Window)
+
+- **Single source of truth for dynamic utilities:** When loading remote utility metadata (for example from `https://o.mkpie.me/api/utilities/status`), avoid independent fetch/mapping logic in multiple components. Prefer a shared hook or shared utility so Launchpad and Spotlight stay in sync.
+- **Prefer dynamic entries over static duplicates:** If a utility exists both in static Launchpad config and in dynamic remote data, prioritize dynamic entries in search/list results and dedupe by `id`.
+- **Stable utility identity:** Use a distinct id namespace for dynamic items (for example `utility-${key}`) so launch behavior can be routed reliably without colliding with static app ids.
+- **Launch behavior contract:** Dynamic utility entries should open inside desktop app windows (iframe content), while regular external links can still open in a browser tab unless explicitly requested otherwise.
+- **Avoid stale state clobbering:** For toggles/actions that can happen in quick succession (for example opening a utility while closing Launchpad/Spotlight), use functional state updates (`setState(prev => ...)`) instead of snapshot-based updates.
+- **Window layering and clickability:** Render utility windows in the same desktop window layer/container as other app windows. Do not place them in a separate overlay container that can break pointer interaction or focus ordering.
+- **Window controls parity:** Utility windows should use the same `AppWindow` lifecycle patterns as normal apps (focus, z-index, maximize, minimize, close) so traffic-light controls work consistently.
+- **Spotlight launch parity:** Spotlight should use the same utility-open path as Launchpad for dynamic utility entries so behavior is identical regardless of where the user launches from.
+- **Debug checklist for "window not clickable" reports:** verify z-index updates on focus, verify the window is in the shared `window-bound` layer, and verify transforms are not being overwritten by stale state updates.
+
 ## Good Places To Check
 - Setup and usage details: [README.md](README.md)
 - Package scripts and tool versions: [package.json](package.json)
