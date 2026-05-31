@@ -105,7 +105,8 @@ export default class Terminal extends React.Component<{}, TerminalState> {
       ls: this.ls,
       cat: this.cat,
       clear: this.clear,
-      help: this.help
+      help: this.help,
+      ssh: this.ssh
     };
   }
 
@@ -236,6 +237,9 @@ export default class Terminal extends React.Component<{}, TerminalState> {
           <span text-red-400>help</span> - Display this help menu
         </li>
         <li>
+          <span text-red-400>ssh</span> - Show SSH quick links and target string
+        </li>
+        <li>
           <span text-red-400>rm -rf /</span> - :)
         </li>
         <li>
@@ -247,6 +251,36 @@ export default class Terminal extends React.Component<{}, TerminalState> {
       </ul>
     );
     this.generateResultRow(this.curInputTimes, help);
+  };
+
+  ssh = () => {
+    const sshOptions = (
+      <ol className="list-decimal ml-6 pb-1.5">
+        <li>
+          <a
+            className="text-blue-300"
+            href="https://github.com/codespaces"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Codespaces
+          </a>
+        </li>
+        <li>jinsanity@s3.serv00.com</li>
+        <li>
+          <a
+            className="text-blue-300"
+            href="https://sshx.io/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            sshx
+          </a>
+        </li>
+      </ol>
+    );
+
+    this.generateResultRow(this.curInputTimes, sshOptions);
   };
 
   autoComplete = (text: string) => {
