@@ -59,6 +59,29 @@
 - **Spotlight launch parity:** Spotlight should use the same utility-open path as Launchpad for dynamic utility entries so behavior is identical regardless of where the user launches from.
 - **Debug checklist for "window not clickable" reports:** verify z-index updates on focus, verify the window is in the shared `window-bound` layer, and verify transforms are not being overwritten by stale state updates.
 
+## RSS Blogs Integration
+
+- **Config shape:** Extend `BearMdData` with an optional `content` field to preserve the existing `file`-based contract and avoid breaking Profile/Projects.
+- **Loader hook:** Implement `src/hooks/useBearBlogs.ts` using `DOMParser`, a cancellation flag, and graceful fallbacks (mirror `useOmkpieUtilities`).
+- **Parsing order:** Prefer `content:encoded` → `description` → fallback text when mapping RSS items.
+- **Sanitization:** Strip or convert embedded HTML to safe plaintext/Markdown before rendering in the Bear pane; never inject raw HTML.
+- **Image URLs:** Rewrite relative GitHub raw image paths using the repo base URL (see `fixImageURL` in `Bear.tsx`).
+- **State sync:** Update `midbarList`, `contentID`, and `contentMd` atomically via functional `setState` to avoid stale selection state.
+- **UX resilience:** Provide explicit loading, empty, and error placeholder items for dynamic categories so the UI stays usable when the feed is slow or unavailable.
+- **CORS & embedding caution:** Avoid fetching full article pages or embedding remote sites unless you control the origin or use an approved server-side proxy.
+- **Performance:** Consider pagination, truncation, or lazy rendering for very large feeds.
+- **Stable IDs:** Generate deterministic, namespaced IDs (e.g., `blog-${slug}`) to avoid collisions and preserve indices across updates.
+- **Testing:** Add unit tests for XML parsing edge cases and an integration smoke test that simulates an unreachable feed.
+- **UX expectation:** Distinguish inline RSS previews from full external articles and keep the external link visible.
+
+## Quick Verification Steps
+
+- **Lint:** `pnpm lint`
+- **Dev server:** `pnpm dev` and open the Bear app.
+- **Verify:** Profile and Projects unchanged; Blogs appears as the third sidebar; clicking a blog item renders the RSS-derived preview and external link.
+- **Negative test:** Change the RSS URL to an invalid host and confirm the Blogs placeholder/error item is shown and the app remains stable.
+
+
 ## Good Places To Check
 - Setup and usage details: [README.md](README.md)
 - Package scripts and tool versions: [package.json](package.json)
