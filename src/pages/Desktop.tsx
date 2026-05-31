@@ -1,9 +1,11 @@
 import React from "react";
 import { apps, wallpapers } from "~/configs";
+import { useOmkpieUtilities } from "~/hooks/useOmkpieUtilities";
 import { minMarginY } from "~/utils";
 import type { MacActions } from "~/types";
 import AboutThisMac from "~/components/AboutThisMac";
 import type { SpotlightHandle } from "~/components/Spotlight";
+import UtilityFrame from "~/components/apps/UtilityFrame";
 
 interface DesktopState {
   showApps: {
@@ -24,9 +26,17 @@ interface DesktopState {
   hideDockAndTopbar: boolean;
   spotlight: boolean;
   aboutThisMac: boolean;
+  utilityWindow: {
+    title: string;
+    src: string;
+    z: number;
+    max: boolean;
+    min: boolean;
+  } | null;
 }
 
 export default function Desktop(props: MacActions) {
+  const dynamicLaunchpadApps = useOmkpieUtilities(props.currentUserAvatar);
   const [state, setState] = useState({
     showApps: {},
     appsZ: {},
@@ -37,7 +47,8 @@ export default function Desktop(props: MacActions) {
     currentTitle: "Finder",
     hideDockAndTopbar: false,
     spotlight: false,
-    aboutThisMac: false
+    aboutThisMac: false,
+    utilityWindow: null
   } as DesktopState);
 
   const [spotlightBtnRef, setSpotlightBtnRef] =
@@ -130,15 +141,102 @@ export default function Desktop(props: MacActions) {
       r.style.transition = "ease-out 0.2s";
     }
 
-    setState({ ...state, showLaunchpad: target });
+    setState((prev) => ({
+      ...prev,
+      showLaunchpad: target
+    }));
   };
 
   const toggleSpotlight = (): void => {
-    setState({ ...state, spotlight: !state.spotlight });
+    setState((prev) => ({
+      ...prev,
+      spotlight: !prev.spotlight
+    }));
   };
 
   const toggleAboutThisMac = (): void => {
     setState({ ...state, aboutThisMac: !state.aboutThisMac });
+  };
+
+  const openUtility = (title: string, src: string): void => {
+    setState((prev) => {
+      const nextZ = prev.maxZ + 1;
+
+      return {
+        ...prev,
+        utilityWindow: {
+          title,
+          src,
+          z: nextZ,
+          max: false,
+          min: false
+        },
+        maxZ: nextZ,
+        showLaunchpad: false,
+        spotlight: false,
+        hideDockAndTopbar: false,
+        currentTitle: title
+      };
+    });
+  };
+
+  const closeUtilityWindow = (): void => {
+    setState((prev) => ({
+      ...prev,
+      utilityWindow: null,
+      currentTitle: "Finder",
+      hideDockAndTopbar: false
+    }));
+  };
+
+  const setUtilityMax = (id: string, target?: boolean): void => {
+    setState((prev) => {
+      if (!prev.utilityWindow) return prev;
+      const nextTarget = target === undefined ? !prev.utilityWindow.max : target;
+
+      return {
+        ...prev,
+        utilityWindow: {
+          ...prev.utilityWindow,
+          max: nextTarget,
+          min: false
+        },
+        hideDockAndTopbar: nextTarget
+      };
+    });
+  };
+
+  const setUtilityMin = (_id: string): void => {
+    setState((prev) => {
+      if (!prev.utilityWindow) return prev;
+
+      return {
+        ...prev,
+        utilityWindow: {
+          ...prev.utilityWindow,
+          min: !prev.utilityWindow.min,
+          max: false
+        },
+        hideDockAndTopbar: false
+      };
+    });
+  };
+
+  const focusUtilityWindow = (_id: string): void => {
+    setState((prev) => {
+      if (!prev.utilityWindow) return prev;
+      const nextZ = prev.maxZ + 1;
+
+      return {
+        ...prev,
+        maxZ: nextZ,
+        currentTitle: prev.utilityWindow.title,
+        utilityWindow: {
+          ...prev.utilityWindow,
+          z: nextZ
+        }
+      };
+    });
   };
 
   const setWindowPosition = (id: string): void => {
@@ -251,7 +349,7 @@ export default function Desktop(props: MacActions) {
   };
 
   const renderAppWindows = () => {
-    return apps.map((app) => {
+    const windows = apps.map((app) => {
       if (app.desktop && state.showApps[app.id]) {
         const props = {
           id: app.id,
@@ -281,6 +379,29 @@ export default function Desktop(props: MacActions) {
         return <div key={`desktop-app-${app.id}`} />;
       }
     });
+
+    if (state.utilityWindow) {
+      windows.push(
+        <AppWindow
+          key="desktop-app-utility"
+          id="utility-window"
+          title={state.utilityWindow.title}
+          width={1024}
+          height={700}
+          max={state.utilityWindow.max}
+          min={state.utilityWindow.min}
+          z={state.utilityWindow.z}
+          close={closeUtilityWindow}
+          setMax={setUtilityMax}
+          setMin={setUtilityMin}
+          focus={focusUtilityWindow}
+        >
+          <UtilityFrame src={state.utilityWindow.src} title={state.utilityWindow.title} />
+        </AppWindow>
+      );
+    }
+
+    return windows;
   };
 
   return (
@@ -320,11 +441,18 @@ export default function Desktop(props: MacActions) {
           toggleLaunchpad={toggleLaunchpad}
           toggleSpotlight={toggleSpotlight}
           btnRef={spotlightBtnRef as React.RefObject<HTMLDivElement>}
+          dynamicPortfolioApps={dynamicLaunchpadApps}
+          openUtility={openUtility}
         />
       )}
 
       {/* Launchpad */}
-      <Launchpad show={state.showLaunchpad} toggleLaunchpad={toggleLaunchpad} />
+      <Launchpad
+        show={state.showLaunchpad}
+        toggleLaunchpad={toggleLaunchpad}
+        currentUserAvatar={props.currentUserAvatar}
+        openUtility={openUtility}
+      />
 
       {/* Dock */}
       <Dock

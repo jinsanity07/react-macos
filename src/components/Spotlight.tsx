@@ -7,11 +7,6 @@ export interface SpotlightHandle {
   focusSearch: () => void;
 }
 
-const APPS: { [key: string]: (LaunchpadData | AppsData)[] } = {
-  app: apps,
-  portfolio: launchpadApps
-};
-
 const getRandom = (min: number, max: number) => {
   min = Math.ceil(min);
   max = Math.floor(max);
@@ -21,8 +16,7 @@ const getRandom = (min: number, max: number) => {
 const getRandomDate = () => {
   const timeStamp = new Date().getTime();
   const randomStamp = getRandom(0, timeStamp);
-  const date = format(randomStamp, "MM/dd/yyyy");
-  return date;
+  return format(randomStamp, "MM/dd/yyyy");
 };
 
 interface SpotlightProps {
@@ -30,10 +24,19 @@ interface SpotlightProps {
   openApp: (id: string) => void;
   toggleLaunchpad: (target: boolean) => void;
   btnRef: React.RefObject<HTMLDivElement>;
+  dynamicPortfolioApps?: LaunchpadData[];
+  openUtility: (title: string, src: string) => void;
 }
 
 const Spotlight = forwardRef<SpotlightHandle, SpotlightProps>(function Spotlight(
-  { toggleSpotlight, openApp, toggleLaunchpad, btnRef },
+  {
+    toggleSpotlight,
+    openApp,
+    toggleLaunchpad,
+    btnRef,
+    dynamicPortfolioApps = [],
+    openUtility
+  },
   ref
 ) {
   const spotlightRef = useRef<HTMLDivElement>(null);
@@ -87,7 +90,14 @@ const Spotlight = forwardRef<SpotlightHandle, SpotlightProps>(function Spotlight
     if (searchText === "") return [];
 
     const text = searchText.toLowerCase();
-    return APPS[type].filter(
+    const source =
+      type === "portfolio"
+        ? [...dynamicPortfolioApps, ...launchpadApps].filter(
+            (item, index, self) => index === self.findIndex((v) => v.id === item.id)
+          )
+        : apps;
+
+    return source.filter(
       (item: LaunchpadData | AppsData) =>
         item.title.toLowerCase().includes(text) || item.id.toLowerCase().includes(text)
     );
@@ -109,7 +119,11 @@ const Spotlight = forwardRef<SpotlightHandle, SpotlightProps>(function Spotlight
       else openApp(id);
       toggleSpotlight();
     } else {
-      window.open(curDetails.link);
+      if (curDetails.type === "portfolio" && curDetails.id.startsWith("utility-")) {
+        openUtility(curDetails.title, curDetails.link);
+      } else {
+        window.open(curDetails.link);
+      }
       toggleSpotlight();
     }
   };
@@ -119,31 +133,31 @@ const Spotlight = forwardRef<SpotlightHandle, SpotlightProps>(function Spotlight
     const typeAppList = [];
     const typeAppIdList = [];
 
-    for (const app of result) {
+    for (const item of result) {
       const curIndex = startIndex + typeAppList.length;
       const bg = curIndex === 0 ? textSelected : "bg-transparent";
       const text = curIndex === 0 ? textWhite : textBlack;
 
-      if (curIndex === 0) setCurrentDetailsWithType(app, type);
+      if (curIndex === 0) setCurrentDetailsWithType(item, type);
 
       typeAppList.push(
         <li
-          id={`spotlight-${app.id}`}
-          key={`spotlight-${app.id}`}
+          id={`spotlight-${item.id}`}
+          key={`spotlight-${item.id}`}
           className={`pr-1 h-7 w-full flex rounded ${bg} ${text} cursor-default`}
           data-app-type={type}
-          onClick={() => handleClick(app.id)}
-          onDoubleClick={() => handleDoubleClick(app.id)}
+          onClick={() => handleClick(item.id)}
+          onDoubleClick={() => handleDoubleClick(item.id)}
         >
           <div className="w-8 flex-center">
-            <img w-5 src={app.img} alt={app.title} title={app.title} />
+            <img w-5 src={item.img} alt={item.title} title={item.title} />
           </div>
           <div className="flex-1 hstack overflow-hidden whitespace-nowrap">
-            {app.title}
+            {item.title}
           </div>
         </li>
       );
-      typeAppIdList.push(app.id);
+      typeAppIdList.push(item.id);
     }
 
     return {
@@ -153,26 +167,26 @@ const Spotlight = forwardRef<SpotlightHandle, SpotlightProps>(function Spotlight
   };
 
   const updateAppList = () => {
-    const app = getTypeAppList("app", 0);
-    const portfolio = getTypeAppList("portfolio", app.appIdList.length);
+    const appResults = getTypeAppList("app", 0);
+    const portfolioResults = getTypeAppList("portfolio", appResults.appIdList.length);
 
-    const newAppIdList = [...app.appIdList, ...portfolio.appIdList];
+    const newAppIdList = [...appResults.appIdList, ...portfolioResults.appIdList];
     if (newAppIdList.length === 0) setCurDetails(null);
 
     const newAppList = (
       <div>
-        {app.appList.length !== 0 && (
+        {appResults.appList.length !== 0 && (
           <div>
             <div className="spotlight-type">Applications</div>
-            <ul className="w-full text-xs">{app.appList}</ul>
+            <ul className="w-full text-xs">{appResults.appList}</ul>
           </div>
         )}
-        {portfolio.appList.length !== 0 && (
+        {portfolioResults.appList.length !== 0 && (
           <div>
             <div className="spotlight-type mt-1.5 before:(content-empty absolute left-0 top-0 ml-2 w-63.5 border-t border-menu)">
               Portfolio
             </div>
-            <ul className="w-full text-xs">{portfolio.appList}</ul>
+            <ul className="w-full text-xs">{portfolioResults.appList}</ul>
           </div>
         )}
       </div>
@@ -182,9 +196,9 @@ const Spotlight = forwardRef<SpotlightHandle, SpotlightProps>(function Spotlight
     setAppList(newAppList);
   };
 
-  const setCurrentDetailsWithType = (app: any, type: string) =>
+  const setCurrentDetailsWithType = (entry: any, type: string) =>
     setCurDetails({
-      ...app,
+      ...entry,
       type
     });
 
@@ -197,9 +211,13 @@ const Spotlight = forwardRef<SpotlightHandle, SpotlightProps>(function Spotlight
     const appId = appIdList[selectedIndex];
     const element = document.querySelector(`#spotlight-${appId}`) as HTMLElement;
     const type = element.dataset.appType as string;
-    const app = APPS[type].find((item: LaunchpadData | AppsData) => item.id === appId);
+    const source =
+      type === "portfolio" ? [...launchpadApps, ...dynamicPortfolioApps] : apps;
+    const currentEntry = source.find(
+      (item: LaunchpadData | AppsData) => item.id === appId
+    );
 
-    setCurrentDetailsWithType(app, type);
+    setCurrentDetailsWithType(currentEntry, type);
   };
 
   const updateHighlight = (prevIndex: number, curIndex: number) => {

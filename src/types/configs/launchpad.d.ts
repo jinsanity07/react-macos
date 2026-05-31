@@ -3,4 +3,5 @@ export interface LaunchpadData {
   title: string;
   img: string;
   link: string;
+  status?: "running" | "stopped" | "unknown";
 }

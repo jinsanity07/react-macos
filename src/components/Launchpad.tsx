@@ -1,22 +1,167 @@
-import { wallpapers, launchpadApps } from "~/configs";
+import { wallpapers, launchpadApps, user } from "~/configs";
+import type { LaunchpadData } from "~/types";
 
 interface LaunchpadProps {
   show: boolean;
   toggleLaunchpad: (target: boolean) => void;
+  currentUserAvatar?: string;
+  openUtility: (title: string, src: string) => void;
 }
 
 const placeholderText = "Search";
 
-export default function Launchpad({ show, toggleLaunchpad }: LaunchpadProps) {
+type UtilitiesStatusResponse = {
+  utilities?: Array<{
+    key?: string;
+    name?: string;
+    endpoint?: string;
+    status?: string;
+  }>;
+};
+
+const GUEST_UTILITY_FALLBACK: NonNullable<UtilitiesStatusResponse["utilities"]> = [
+  {
+    key: "gasana",
+    name: "Asana",
+    endpoint: "/app/gasana",
+    status: "stopped"
+  },
+  {
+    key: "caizheng",
+    name: "Cai Zheng Paystub",
+    endpoint: "/app/caizheng",
+    status: "stopped"
+  },
+  {
+    key: "jiji",
+    name: "Jiji",
+    endpoint: "/app/jiji",
+    status: "stopped"
+  },
+  {
+    key: "joglog",
+    name: "Jog🏃🏻Log",
+    endpoint: "/app/joglog",
+    status: "running"
+  },
+  {
+    key: "drive_search",
+    name: "Local Drive Search",
+    endpoint: "/app/drive-search",
+    status: "stopped"
+  },
+  {
+    key: "ownpie",
+    name: "Own Pie",
+    endpoint: "/app/ownpie",
+    status: "running"
+  },
+  {
+    key: "sigbot",
+    name: "Sigbot",
+    endpoint: "/sigbot/gradio",
+    status: "stopped"
+  },
+  {
+    key: "usageboard",
+    name: "UsageBoard",
+    endpoint: "/app/usageboard",
+    status: "running"
+  },
+  {
+    key: "workspace_connectivity",
+    name: "Workspace Connectivity",
+    endpoint: "/app/workspace-connectivity",
+    status: "stopped"
+  }
+];
+
+const isOmkpieSession = (currentUserAvatar?: string) => {
+  return currentUserAvatar !== undefined && currentUserAvatar !== user.avatar;
+};
+
+const getUtilityIcon = (status?: string) => {
+  if (status === "running") return "img/icons/launchpad/flint.png";
+  return "img/icons/launchpad/gungnir.png";
+};
+
+const buildUtilities = (utilities: UtilitiesStatusResponse["utilities"] = []) => {
+  return utilities
+    .filter((utility) => utility.key && utility.name && utility.endpoint)
+    .map((utility) => ({
+      id: `utility-${utility.key}`,
+      title: utility.name as string,
+      img: getUtilityIcon(utility.status),
+      link: `https://o.mkpie.me${utility.endpoint}`,
+      status: (utility.status as LaunchpadData["status"]) ?? "unknown"
+    }));
+};
+
+export default function Launchpad({
+  show,
+  toggleLaunchpad,
+  currentUserAvatar,
+  openUtility
+}: LaunchpadProps) {
   const dark = useStore((state) => state.dark);
 
   const [searchText, setSearchText] = useState("");
   const [focus, setFocus] = useState(false);
+  const [remoteApps, setRemoteApps] = useState<LaunchpadData[]>([]);
+
+  const mergeLaunchpadItems = () => {
+    const items = [...remoteApps, ...launchpadApps];
+    return items.filter(
+      (item, index, self) => index === self.findIndex((v) => v.id === item.id)
+    );
+  };
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadUtilities() {
+      if (!isOmkpieSession(currentUserAvatar)) {
+        if (!cancelled) setRemoteApps(buildUtilities(GUEST_UTILITY_FALLBACK));
+        return;
+      }
+
+      try {
+        const res = await fetch("https://o.mkpie.me/api/utilities/status", {
+          credentials: "include"
+        });
+
+        if (!res.ok) {
+          if (!cancelled) setRemoteApps([]);
+          return;
+        }
+
+        const data: unknown = await res.json().catch(() => null);
+        const utilities =
+          data &&
+          typeof data === "object" &&
+          Array.isArray((data as UtilitiesStatusResponse).utilities)
+            ? (data as UtilitiesStatusResponse).utilities
+            : [];
+
+        if (!cancelled) setRemoteApps(buildUtilities(utilities));
+      } catch {
+        if (!cancelled) setRemoteApps([]);
+      }
+    }
+
+    loadUtilities();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [currentUserAvatar]);
 
   const search = () => {
-    if (searchText === "") return launchpadApps;
+    const items = mergeLaunchpadItems();
+
+    if (searchText === "") return items;
     const text = searchText.toLowerCase();
-    const list = launchpadApps.filter((item) => {
+    const list = items.filter((item) => {
       return (
         item.title.toLowerCase().includes(text) || item.id.toLowerCase().includes(text)
       );
@@ -64,15 +209,23 @@ export default function Launchpad({ show, toggleLaunchpad }: LaunchpadProps) {
         >
           {search().map((app) => (
             <div key={`launchpad-${app.id}`} h="32 sm:36" flex="~ col">
-              <a
+              <button
                 className="w-14 sm:w-20 mx-auto"
-                href={app.link}
-                target="_blank"
-                rel="noreferrer"
-                onClick={(e) => e.stopPropagation()}
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+
+                  if (app.id.startsWith("utility-")) {
+                    openUtility(app.title, app.link);
+                    toggleLaunchpad(false);
+                    return;
+                  }
+
+                  window.open(app.link);
+                }}
               >
                 <img src={app.img} alt={app.title} title={app.title} />
-              </a>
+              </button>
               <span m="t-2 x-auto" text="white xs sm:sm">
                 {app.title}
               </span>
