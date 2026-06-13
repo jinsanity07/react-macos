@@ -49,7 +49,8 @@ const apps: AppsData[] = [
     x: 80,
     y: -30,
     img: "https://www.youtube.com/s/desktop/4981804c/img/logos/favicon_144x144.png",
-    content: <Youtube />
+    iframeSrc: "https://www.youtube.com/embed/Wj0bFJLs92A?si=cYOhl25FChFiOWjU",
+    iframeVersion: "0.0.1"
   },
   {
     id: "Book",
@@ -60,7 +61,8 @@ const apps: AppsData[] = [
     x: 80,
     y: -30,
     img: "https://cdn.readest.com/images/readest-icon.png",
-    content: <Book />
+    iframeSrc: "https://web.readest.com/library",
+    iframeVersion: "0.0.1"
   },
   {
     id: "ownpie",
@@ -71,7 +73,8 @@ const apps: AppsData[] = [
     x: 80,
     y: -30,
     img: "img/icons/sunrise-calendar.avif",
-    content: <Ownpie />
+    iframeSrc: "https://o.mkpie.me/app/ownpie/",
+    iframeVersion: "0.0.1"
   },
   {
     id: "vscode",
@@ -82,7 +85,8 @@ const apps: AppsData[] = [
     x: 80,
     y: -30,
     img: "img/icons/vscode.png",
-    content: <VSCode />
+    iframeSrc: "https://github1s.com/jinsanity07git/python-for-transportation-modeling",
+    iframeVersion: "0.0.1"
   },
   {
     id: "facetime",

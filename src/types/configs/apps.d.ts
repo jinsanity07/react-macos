@@ -13,4 +13,12 @@ export interface AppsData {
   y?: number;
   content?: JSX.Element;
   link?: string;
+  /**
+   * When set, the dock-hosted app renders a single iframe with this src
+   * (instead of `content`) and is eligible for the per-app menu in the
+   * top bar (Open in New Tab / Refresh / Version).
+   */
+  iframeSrc?: string;
+  /** Display version when `iframeSrc` is set. Defaults to `v0.0.1`. */
+  iframeVersion?: string;
 }

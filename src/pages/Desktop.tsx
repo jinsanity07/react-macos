@@ -5,7 +5,7 @@ import { minMarginY } from "~/utils";
 import type { MacActions } from "~/types";
 import AboutThisMac from "~/components/AboutThisMac";
 import type { SpotlightHandle } from "~/components/Spotlight";
-import UtilityFrame from "~/components/apps/UtilityFrame";
+import IframeFrame from "~/components/apps/IframeFrame";
 
 interface DesktopState {
   showApps: {
@@ -35,6 +35,9 @@ interface DesktopState {
     max: boolean;
     min: boolean;
   } | null;
+  iframeAppRefreshKeys: {
+    [id: string]: number;
+  };
 }
 
 export default function Desktop(props: MacActions) {
@@ -50,7 +53,8 @@ export default function Desktop(props: MacActions) {
     hideDockAndTopbar: false,
     spotlight: false,
     aboutThisMac: false,
-    utilityWindow: null
+    utilityWindow: null,
+    iframeAppRefreshKeys: {}
   } as DesktopState);
 
   const [spotlightBtnRef, setSpotlightBtnRef] =
@@ -200,6 +204,35 @@ export default function Desktop(props: MacActions) {
 
   const openUtilityInNewTab = (src: string): void => {
     window.open(src, "_blank", "noopener,noreferrer");
+  };
+
+  const refreshIframeApp = (id: string): void => {
+    setState((prev) => ({
+      ...prev,
+      iframeAppRefreshKeys: {
+        ...prev.iframeAppRefreshKeys,
+        [id]: (prev.iframeAppRefreshKeys[id] ?? 0) + 1
+      }
+    }));
+  };
+
+  const openIframeAppInNewTab = (src: string): void => {
+    window.open(src, "_blank", "noopener,noreferrer");
+  };
+
+  const focusIframeApp = (id: string): void => {
+    setState((prev) => {
+      const app = apps.find((a) => a.id === id);
+      if (!app || !app.iframeSrc) return prev;
+      const nextZ = prev.maxZ + 1;
+
+      return {
+        ...prev,
+        appsZ: { ...prev.appsZ, [id]: nextZ },
+        maxZ: nextZ,
+        currentTitle: app.title
+      };
+    });
   };
 
   const closeUtilityWindow = (): void => {
@@ -394,7 +427,15 @@ export default function Desktop(props: MacActions) {
 
         return (
           <AppWindow key={`desktop-app-${app.id}`} {...props}>
-            {app.content}
+            {app.iframeSrc ? (
+              <IframeFrame
+                src={app.iframeSrc}
+                title={app.title}
+                refreshKey={state.iframeAppRefreshKeys[app.id] ?? 0}
+              />
+            ) : (
+              app.content
+            )}
           </AppWindow>
         );
       } else {
@@ -418,7 +459,7 @@ export default function Desktop(props: MacActions) {
           setMin={setUtilityMin}
           focus={focusUtilityWindow}
         >
-          <UtilityFrame
+          <IframeFrame
             src={state.utilityWindow.src}
             title={state.utilityWindow.title}
             refreshKey={state.utilityWindow.refreshKey}
@@ -448,10 +489,23 @@ export default function Desktop(props: MacActions) {
                 src: state.utilityWindow.src,
                 version: state.utilityWindow.version
               }
-            : null
+            : (() => {
+                const focused = state.currentTitle;
+                if (!focused) return null;
+                const app = apps.find((a) => a.title === focused && a.iframeSrc);
+                if (!app || !app.iframeSrc) return null;
+                return {
+                  id: app.id,
+                  title: app.title,
+                  src: app.iframeSrc,
+                  version: `v${app.iframeVersion ?? "0.0.1"}`
+                };
+              })()
         }
         refreshUtility={refreshUtility}
         openUtilityInNewTab={openUtilityInNewTab}
+        refreshIframeApp={refreshIframeApp}
+        openIframeAppInNewTab={openIframeAppInNewTab}
         setLogin={props.setLogin}
         currentUserName={props.currentUserName}
         shutMac={props.shutMac}

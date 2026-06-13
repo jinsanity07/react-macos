@@ -26,6 +26,7 @@ The parent `~/apps/CLAUDE.md` covers cross-project layout. Stay inside this dire
   - `useBearBlogs` — fetches the live RSS feed for the Bear app's "Blogs" sidebar entry. Uses `DOMParser`, a cancellation flag, and explicit loading/empty/error placeholders.
   - `useOmkpieUtilities` — fetches dynamic utility metadata for Launchpad + Spotlight + the UtilityFrame app. Keep Launchpad and Spotlight in sync via this single source of truth.
 - **Markdown rendering** for Bear uses `react-markdown` + `remark-gfm` + `remark-math` + `rehype-katex` + `rehype-external-links` (no `rehype-raw` — the RSS feed body is markdown, not HTML). `Typora` uses Milkdown (a ProseMirror-based WYSIWYG). `react-syntax-highlighter` is used by VS Code. The Bear CSS lives in `src/styles/bear.css` (scoped under `.bear .markdown`).
+- **Iframe apps** (both dynamic utilities and dock-launched apps) render through the shared `src/components/apps/IframeFrame.tsx` shell. The shell applies a `key={refreshKey}` so the top-bar "Refresh Page" menu item can re-mount the embedded page by bumping the key. Dynamic utility windows are driven by `openUtility(title, src, version?)` in `Desktop`; dock apps set `iframeSrc` (and optional `iframeVersion`) on their `AppsData` entry.
 - **SanityMenu** is the new top-bar plugin panel — follow the existing Control Center floating-menu shell pattern (fixed placement, `useClickOutside`, launcher button alongside other status icons; consistent sizing/border/shadow/spacing).
 - **UtilityFrame** is the desktop window shell for dynamic utility entries (iframe-rendered remote pages). See `AGENTS.md` for embedding caveats — many sites block framing via `X-Frame-Options`/`CSP`; do not bypass with header-stripping proxies.
 - **Deploy target** is GitHub Pages via `.github/workflows/deploy.yaml`, triggered on push to `jinsanity` (not `main`). The workflow clones `jinsanity07/jinsanity07.github.io` to publish.
@@ -58,6 +59,7 @@ There is **no test suite** — the project doesn't ship unit tests; CI is build 
 - Multi-user login: only `{ ok: true }` JSON counts as success; require `credentials: "include"` for cross-origin; use the server-returned `username`.
 - Dynamic utilities: single source of truth (`useOmkpieUtilities`), namespace ids as `utility-${key}`, dedupe by `id`, prioritize dynamic over static, use functional `setState` updates, keep windowing parity with normal apps.
 - Bear RSS blogs: extend `BearMdData` with optional `content`; parse `content:encoded` → `description` → fallback; rewrite relative GitHub raw image paths via `fixImageURL`; provide loading/empty/error placeholders; keep the external link visible.
+- Per-app iframe menu: apps that render an iframe (dynamic `LaunchpadData` utilities and dock-launched `AppsData` entries with `iframeSrc`) get a top-bar app menu (Open in New Tab / Refresh / Version). Set `version` on the launchpad entry and `iframeVersion` on the dock entry; otherwise the menu falls back to `v0.0.1`. Refresh works by bumping a `refreshKey` on `<IframeFrame>` so React remounts the iframe.
 
 ## Quick verification
 
@@ -69,6 +71,7 @@ pnpm dev                         # click into Bear → "Blogs" sidebar entry
 - Profile and Projects must be unchanged after Bear changes.
 - Clicking a blog item should render the RSS-derived preview with the "Read Full Article" external link visible.
 - Negative test: change `BEAR_BLOG_RSS_URL` to an invalid host and confirm the Blogs placeholder/error item is shown and the app remains stable.
+- Per-app iframe menu: open a Launchpad utility (e.g. RA2 Web) and a dock app with `iframeSrc` (e.g. VSCode); the top bar should show the focused app's name with a dropdown containing Open in New Tab / Refresh Page / Version.
 
 ## Good places to check
 

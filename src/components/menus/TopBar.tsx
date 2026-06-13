@@ -68,12 +68,15 @@ const UsageBoardIcon = ({ size }: { size: number }) => {
 interface TopBarProps extends MacActions {
   title: string;
   activeUtility?: {
+    id?: string;
     title: string;
     src: string;
     version: string;
   } | null;
   refreshUtility?: () => void;
   openUtilityInNewTab?: (src: string) => void;
+  refreshIframeApp?: (id: string) => void;
+  openIframeAppInNewTab?: (src: string) => void;
   setSpotlightBtnRef: (value: React.RefObject<HTMLDivElement>) => void;
   hide: boolean;
   toggleSpotlight: () => void;
@@ -278,14 +281,22 @@ const TopBar = (props: TopBarProps) => {
       )}
 
       {/* Open this when clicking the focused utility's app-name button */}
-      {state.showUtilityMenu && props.activeUtility && props.refreshUtility && (
+      {state.showUtilityMenu && props.activeUtility && (
         <UtilityMenu
           title={props.activeUtility.title}
           src={props.activeUtility.src}
           version={props.activeUtility.version}
-          onOpenInNewTab={props.openUtilityInNewTab ?? (() => {})}
+          onOpenInNewTab={
+            props.activeUtility.id && props.openIframeAppInNewTab
+              ? () => props.openIframeAppInNewTab?.(props.activeUtility!.src)
+              : () => props.openUtilityInNewTab?.(props.activeUtility!.src)
+          }
           onRefresh={() => {
-            props.refreshUtility?.();
+            if (props.activeUtility?.id) {
+              props.refreshIframeApp?.(props.activeUtility.id);
+            } else {
+              props.refreshUtility?.();
+            }
             toggleUtilityMenu();
           }}
           onClose={toggleUtilityMenu}
