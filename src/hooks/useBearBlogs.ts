@@ -8,6 +8,11 @@ const stripHtml = (input: string) => {
   return (doc.body.textContent || "").replace(/\s+/g, " ").trim();
 };
 
+const decodeEntities = (input: string) => {
+  const doc = new DOMParser().parseFromString(input, "text/html");
+  return (doc.documentElement.textContent || "").replace(/ /g, " ");
+};
+
 const safeText = (node: Element, tags: string[]) => {
   for (const tag of tags) {
     const value = node.getElementsByTagName(tag)[0]?.textContent?.trim();
@@ -42,7 +47,8 @@ const mapRssItems = (xmlText: string): BearMdData[] => {
       safeText(item, ["description"]) ||
       "No article summary is available.";
 
-    const summary = stripHtml(rawBody);
+    const body = decodeEntities(rawBody);
+    const summary = stripHtml(body);
     const excerpt = summary.slice(0, 140) + (summary.length > 140 ? "..." : "");
 
     let id = toBlogId(guid || link || title, index);
@@ -50,12 +56,9 @@ const mapRssItems = (xmlText: string): BearMdData[] => {
     usedIds.add(id);
 
     const content = [
-      `# ${title}`,
       pubDate ? `Published: ${pubDate}` : "",
-      "",
-      summary,
-      "",
-      link ? `[Read Full Article](${link})` : ""
+      body,
+      link ? `## Read Full Article\n\n[${link}](${link})` : ""
     ]
       .filter(Boolean)
       .join("\n\n");

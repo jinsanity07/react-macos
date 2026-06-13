@@ -1,3 +1,11 @@
+.bear .markdown {
+  /* Trim the big mt-6/mt-7 gap on the very first child (typically the
+     article's leading heading or the "Published:" line in RSS posts). */
+  & > *:first-child {
+    @apply mt-0;
+  }
+}
+
 .bear .markdown a {
   @apply text-red-500 dark:text-red-400;
 }
@@ -95,7 +103,7 @@
 }
 
 .bear .markdown pre {
-  @apply mt-2 text-sm;
+  @apply mt-2 text-sm overflow-x-auto max-w-full;
 }
 
 .bear .markdown pre code {
@@ -111,7 +119,7 @@
 }
 
 .bear .markdown img {
-  @apply inline-block;
+  @apply inline-block max-w-full h-auto rounded;
 }
 
 .bear .markdown table {
@@ -125,4 +133,12 @@
 
 .bear .markdown table tr {
   @apply border-t border-gray-300 bg-transparent;
+}
+
+.bear .markdown hr {
+  @apply my-6 border-0 border-t border-c-300;
+}
+
+.bear .markdown blockquote {
+  @apply border-l-4 border-red-500 dark:border-red-400 pl-4 italic text-c-600 dark:text-c-400 my-4;
 }
