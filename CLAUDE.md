@@ -6,6 +6,8 @@ A React + TypeScript portfolio site styled to look like macOS (login screen, boo
 
 The parent `~/apps/CLAUDE.md` covers cross-project layout. Stay inside this directory — the workspace root is not a git repo.
 
+> This is the `jinsanity` branch. The most recent divergence from `origin/main` introduced a live RSS feed in the Bear app, dynamic utility apps, a SanityMenu, and UtilityFrame. See `AGENTS.md` for the full agent guidelines (hotkey practice, embedding caveats, dynamic-utility rules, RSS blogs integration rules).
+
 ## Architecture in one sentence
 
 `src/index.tsx` boots the app into one of three pages (`Boot` → `Login` → `Desktop`) → `Desktop` reads from a single Zustand store (`src/stores/index.ts`) composed of three slices (`dock`, `system`, `user`) → components in `src/components/{dock,menus,apps}` and `src/pages/` render from store state and configs in `src/configs/`.
@@ -13,25 +15,65 @@ The parent `~/apps/CLAUDE.md` covers cross-project layout. Stay inside this dire
 ## Stack & conventions
 
 - **React 18 + Vite + TypeScript (strict)**, no router. Page transitions are conditional renders in `App()`.
+- **Node** is pinned in `.nvmrc` (use `fnm`); **pnpm** version is pinned in `package.json` (use `corepack`). Do not introduce a different package manager or Node target unless the task explicitly requires it.
 - **State: Zustand slice pattern.** Each slice is a `create…Slice` factory combined in `src/stores/index.ts`; types are `DockSlice` & `SystemSlice` & `UserSlice`. Components consume `useStore` directly.
 - **UnoCSS** for utility classes (preset in `unocss.config.ts`); **`unplugin-auto-import`** auto-imports React hooks + `src/hooks/**` + `src/stores/**` + `src/components/**` — no need to import `useState` etc. The generated types live in `src/auto-imports.d.ts` (do not hand-edit).
 - **Path alias `~/*` → `src/*`** is configured in both `vite.config.ts` and `tsconfig.json`. Always import via `~/...` for in-repo modules.
 - **Configs are typed.** `src/configs/*.tsx` and `*.ts` export the data for each app (Bear notebooks, Terminal commands, Launchpad apps, Music playlist, wallpapers, websites, user profile); the matching `src/types/configs/*.d.ts` declares the shapes — keep them in sync when adding an app.
-- **Window chrome** lives in `src/components/AppWindow.tsx` (drag/resize via `react-rnd`, min/max/close traffic lights, z-order). All app windows wrap their content in this.
-- **Hooks** in `src/hooks/`: `useWindowSize`, `useAudio`, `useBattery` (Battery API → 100% on unsupported browsers, per the README), `useInterval`, `useClickOutside`.
-- **Markdown rendering** for Bear/Typora uses `react-markdown` + `remark-gfm` + `remark-math` + `rehype-katex` + `rehype-external-links`. The `react-syntax-highlighter` is used by VS Code.
-- **Deploy target** is GitHub Pages (CNAME `portfolio.zxh.me`) via `peaceiris/actions-gh-pages@v3`, triggered on push to `main` (`.github/workflows/deploy.yaml`).
+- **Window chrome** lives in `src/components/AppWindow.tsx` (drag/resize via `react-rnd`, min/max/close traffic lights, z-order). All app windows wrap their content in this. Dynamic utility entries reuse the same window lifecycle (focus, z-index, maximize/minimize, close) and live in the shared `window-bound` layer — see `AGENTS.md` for the "window not clickable" debug checklist.
+- **Hooks** in `src/hooks/`:
+  - `useWindowSize`, `useAudio`, `useBattery` (Battery API → 100% on unsupported browsers, per the README), `useInterval`, `useClickOutside`
+  - `useBearBlogs` — fetches the live RSS feed for the Bear app's "Blogs" sidebar entry. Uses `DOMParser`, a cancellation flag, and explicit loading/empty/error placeholders.
+  - `useOmkpieUtilities` — fetches dynamic utility metadata for Launchpad + Spotlight + the UtilityFrame app. Keep Launchpad and Spotlight in sync via this single source of truth.
+- **Markdown rendering** for Bear uses `react-markdown` + `remark-gfm` + `remark-math` + `rehype-katex` + `rehype-external-links` (no `rehype-raw` — the RSS feed body is markdown, not HTML). `Typora` uses Milkdown (a ProseMirror-based WYSIWYG). `react-syntax-highlighter` is used by VS Code. The Bear CSS lives in `src/styles/bear.css` (scoped under `.bear .markdown`).
+- **SanityMenu** is the new top-bar plugin panel — follow the existing Control Center floating-menu shell pattern (fixed placement, `useClickOutside`, launcher button alongside other status icons; consistent sizing/border/shadow/spacing).
+- **UtilityFrame** is the desktop window shell for dynamic utility entries (iframe-rendered remote pages). See `AGENTS.md` for embedding caveats — many sites block framing via `X-Frame-Options`/`CSP`; do not bypass with header-stripping proxies.
+- **Deploy target** is GitHub Pages via `.github/workflows/deploy.yaml`, triggered on push to `jinsanity` (not `main`). The workflow clones `jinsanity07/jinsanity07.github.io` to publish.
 - **Husky** runs `pnpm lint-staged` on pre-commit (eslint --fix on `*.{js,ts,tsx}`, `sort-package-json` on `package.json`).
 
 ## Commands
 
 ```bash
 # All commands run from this directory. pnpm@9 is the package manager (see packageManager field).
-pnpm install --frozen-lockfile          # CI install
-pnpm dev                                # vite dev server with --host
-pnpm build                              # production build to dist/
-pnpm serve                              # vite preview --host
-pnpm lint                               # eslint .
+fnm use                          # pick up the Node version pinned in .nvmrc
+corepack enable                  # activate the pinned pnpm
+pnpm install --frozen-lockfile   # CI install
+pnpm dev                         # vite dev server with --host
+pnpm build                       # production build to dist/ (and zips docs.zip)
+pnpm serve                       # vite preview --host
+pnpm lint                        # eslint .
 ```
 
 There is **no test suite** — the project doesn't ship unit tests; CI is build + deploy only. `package.json` has no `test` script.
+
+## Working rules (cheat sheet — full version in AGENTS.md)
+
+- Prefer small, local changes over broad refactors.
+- Follow existing component and store patterns; don't introduce new architectural layers.
+- Keep UI changes aligned with the current macOS-inspired visual language unless explicitly asked for a redesign.
+- Update `README.md` when setup or usage behavior changes.
+- For new top-bar plugin panels, reuse the Control Center floating-menu shell.
+- If a feature embeds a remote page, prefer a direct iframe with no extra browser chrome — unless the user asks for navigation controls. Many sites block framing; expose blocked ones as external Launchpad links instead.
+- Treat browser hotkeys as in-page shortcuts (capture-phase on `window`); provide a fallback chord and prefer a focused imperative API like `focusSearch()`.
+- Multi-user login: only `{ ok: true }` JSON counts as success; require `credentials: "include"` for cross-origin; use the server-returned `username`.
+- Dynamic utilities: single source of truth (`useOmkpieUtilities`), namespace ids as `utility-${key}`, dedupe by `id`, prioritize dynamic over static, use functional `setState` updates, keep windowing parity with normal apps.
+- Bear RSS blogs: extend `BearMdData` with optional `content`; parse `content:encoded` → `description` → fallback; rewrite relative GitHub raw image paths via `fixImageURL`; provide loading/empty/error placeholders; keep the external link visible.
+
+## Quick verification
+
+```bash
+pnpm lint && pnpm build          # static checks
+pnpm dev                         # click into Bear → "Blogs" sidebar entry
+```
+
+- Profile and Projects must be unchanged after Bear changes.
+- Clicking a blog item should render the RSS-derived preview with the "Read Full Article" external link visible.
+- Negative test: change `BEAR_BLOG_RSS_URL` to an invalid host and confirm the Blogs placeholder/error item is shown and the app remains stable.
+
+## Good places to check
+
+- Agent rules, hotkey practice, embedding caveats, dynamic-utility rules, RSS blogs integration rules: [AGENTS.md](AGENTS.md)
+- Setup and usage details: [README.md](README.md)
+- Package scripts and tool versions: [package.json](package.json)
+- Styles and visual system: [src/styles/](src/styles/)
+- App configuration data: [src/configs/](src/configs/)
