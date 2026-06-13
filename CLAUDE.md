@@ -80,3 +80,16 @@ pnpm dev                         # click into Bear → "Blogs" sidebar entry
 - Package scripts and tool versions: [package.json](package.json)
 - Styles and visual system: [src/styles/](src/styles/)
 - App configuration data: [src/configs/](src/configs/)
+
+## Post-task completion automation
+
+After a code-affecting task completes in this repo (`jinsanity` branch) — a bug fix, new feature, refactor, or any non-trivial code change — the agent must automatically run, in order, **before the turn ends**:
+
+1. **Bump the version by one point in `package.json`** (semver patch, e.g. `1.2.4` → `1.2.5`).
+2. **Commit all changes** (staged + unstaged, including the version bump) with a descriptive message. End the message with a `Co-Authored-By: Claude <noreply@anthropic.com>` trailer.
+3. **Push to `origin/jinsanity`** (the deploy target per `.github/workflows/deploy.yaml`).
+
+A `Stop` hook in `.claude/settings.local.json` injects a reminder into the model's context on every turn end. **Skip this for:** doc-only edits, single-comment or single-line changes, pure conversation, plan-mode work, or turns that only inspected code. If unsure whether the task qualifies as "major", ask the user before bumping/pushing.
+
+Manual exceptions (e.g. squash-merge strategy changes, force-push) require explicit user instruction — never force-push `jinsanity` without confirmation, since the GitHub Pages deploy workflow is triggered on push.
+

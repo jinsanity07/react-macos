@@ -10,11 +10,14 @@ import {
 
 // Hover effect is adopted from https://github.com/PuruVJ/macos-web/blob/main/src/components/dock/DockItem.tsx
 
+import { useHoverCapable } from "~/hooks/useHoverCapable";
+
 const useDockHoverAnimation = (
   mouseX: MotionValue,
   ref: React.RefObject<HTMLImageElement>,
   dockSize: number,
-  dockMag: number
+  dockMag: number,
+  enabled: boolean
 ) => {
   const distanceLimit = dockSize * 6;
   const distanceInput = [
@@ -46,6 +49,13 @@ const useDockHoverAnimation = (
   const width = useTransform(widthPX, (width) => `${width / 16}rem`);
 
   useRaf(() => {
+    // On touch-primary devices the magnification pipeline is disabled
+    // outright — iOS Safari's sticky :hover state would otherwise leave
+    // the last-tapped icon visually enlarged after a tap.
+    if (!enabled) {
+      distance.set(beyondTheDistanceLimit);
+      return;
+    }
     const el = ref.current;
     const mouseXVal = mouseX.get();
     if (el && mouseXVal !== null) {
@@ -90,8 +100,19 @@ export default function DockItem({
   dockMag
 }: DockItemProps) {
   const imgRef = useRef<HTMLImageElement>(null);
-  const { width } = useDockHoverAnimation(mouseX, imgRef, dockSize, dockMag);
+  const hoverCapable = useHoverCapable();
+  const { width } = useDockHoverAnimation(
+    mouseX,
+    imgRef,
+    dockSize,
+    dockMag,
+    hoverCapable
+  );
   const { winWidth } = useWindowSize();
+  // Disable the hover-magnify pipeline on small viewports *or* on
+  // touch-primary devices, where it gets stuck after a tap.
+  const motionStyle =
+    !hoverCapable || winWidth < 640 ? {} : { width, willChange: "width" };
 
   return (
     <li
@@ -114,7 +135,7 @@ export default function DockItem({
             alt={title}
             title={title}
             draggable={false}
-            style={winWidth < 640 ? {} : { width, willChange: "width" }}
+            style={motionStyle}
           />
         </a>
       ) : (
@@ -124,7 +145,7 @@ export default function DockItem({
           alt={title}
           title={title}
           draggable={false}
-          style={winWidth < 640 ? {} : { width, willChange: "width" }}
+          style={motionStyle}
         />
       )}
       <div

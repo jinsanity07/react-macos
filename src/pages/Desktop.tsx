@@ -5,7 +5,7 @@ import { minMarginY } from "~/utils";
 import type { MacActions } from "~/types";
 import AboutThisMac from "~/components/AboutThisMac";
 import type { SpotlightHandle } from "~/components/Spotlight";
-import IframeFrame from "~/components/apps/IframeFrame";
+import IframeFrame, { type IframeFrameHandle } from "~/components/apps/IframeFrame";
 
 interface DesktopState {
   showApps: {
@@ -61,6 +61,12 @@ export default function Desktop(props: MacActions) {
     useState<React.RefObject<HTMLDivElement> | null>(null);
   const spotlightRef = useRef<SpotlightHandle | null>(null);
   const spotlightOpenRef = useRef(false);
+
+  // Live handles to currently mounted iframes, so the per-app menu's
+  // "Refresh Page" can call `.reload()` on them instead of remounting
+  // (which would destroy the browsing context and log the user out).
+  const utilityIframeRef = useRef<IframeFrameHandle | null>(null);
+  const iframeAppHandlesRef = useRef<Map<string, IframeFrameHandle>>(new Map());
 
   const { dark, brightness } = useStore((state) => ({
     dark: state.dark,
@@ -189,17 +195,7 @@ export default function Desktop(props: MacActions) {
   };
 
   const refreshUtility = (): void => {
-    setState((prev) => {
-      if (!prev.utilityWindow) return prev;
-
-      return {
-        ...prev,
-        utilityWindow: {
-          ...prev.utilityWindow,
-          refreshKey: prev.utilityWindow.refreshKey + 1
-        }
-      };
-    });
+    utilityIframeRef.current?.reload();
   };
 
   const openUtilityInNewTab = (src: string): void => {
@@ -207,13 +203,7 @@ export default function Desktop(props: MacActions) {
   };
 
   const refreshIframeApp = (id: string): void => {
-    setState((prev) => ({
-      ...prev,
-      iframeAppRefreshKeys: {
-        ...prev.iframeAppRefreshKeys,
-        [id]: (prev.iframeAppRefreshKeys[id] ?? 0) + 1
-      }
-    }));
+    iframeAppHandlesRef.current.get(id)?.reload();
   };
 
   const openIframeAppInNewTab = (src: string): void => {
@@ -429,6 +419,13 @@ export default function Desktop(props: MacActions) {
           <AppWindow key={`desktop-app-${app.id}`} {...props}>
             {app.iframeSrc ? (
               <IframeFrame
+                ref={(handle) => {
+                  if (handle) {
+                    iframeAppHandlesRef.current.set(app.id, handle);
+                  } else {
+                    iframeAppHandlesRef.current.delete(app.id);
+                  }
+                }}
                 src={app.iframeSrc}
                 title={app.title}
                 refreshKey={state.iframeAppRefreshKeys[app.id] ?? 0}
@@ -460,6 +457,7 @@ export default function Desktop(props: MacActions) {
           focus={focusUtilityWindow}
         >
           <IframeFrame
+            ref={utilityIframeRef}
             src={state.utilityWindow.src}
             title={state.utilityWindow.title}
             refreshKey={state.utilityWindow.refreshKey}
