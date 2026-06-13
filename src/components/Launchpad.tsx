@@ -5,7 +5,7 @@ interface LaunchpadProps {
   show: boolean;
   toggleLaunchpad: (target: boolean) => void;
   currentUserAvatar?: string;
-  openUtility: (title: string, src: string) => void;
+  openUtility: (title: string, src: string, version?: string) => void;
 }
 
 const placeholderText = "Search";
@@ -16,6 +16,7 @@ type UtilitiesStatusResponse = {
     name?: string;
     endpoint?: string;
     status?: string;
+    version?: string;
   }>;
 };
 
@@ -93,7 +94,8 @@ const buildUtilities = (utilities: UtilitiesStatusResponse["utilities"] = []) =>
       title: utility.name as string,
       img: getUtilityIcon(utility.status),
       link: `https://o.mkpie.me${utility.endpoint}`,
-      status: (utility.status as LaunchpadData["status"]) ?? "unknown"
+      status: (utility.status as LaunchpadData["status"]) ?? "unknown",
+      version: utility.version
     }));
 };
 
@@ -216,7 +218,7 @@ export default function Launchpad({
                   e.stopPropagation();
 
                   if (app.id.startsWith("utility-")) {
-                    openUtility(app.title, app.link);
+                    openUtility(app.title, app.link, app.version);
                     toggleLaunchpad(false);
                     return;
                   }

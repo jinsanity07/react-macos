@@ -67,8 +67,9 @@ const launchpadApps: LaunchpadData[] = [
   {
     id: "utility-ra2web",
     title: "RA2 Web",
-    img: "https://game.ra2web.com/favicon.ico",
-    link: "https://game.ra2web.com/"
+    img: "img/icons/launchpad/ra2web.png",
+    link: "https://game.ra2web.com/",
+    version: "0.0.1"
   }
 ];
 

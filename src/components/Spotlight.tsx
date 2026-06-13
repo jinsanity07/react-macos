@@ -25,7 +25,7 @@ interface SpotlightProps {
   toggleLaunchpad: (target: boolean) => void;
   btnRef: React.RefObject<HTMLDivElement>;
   dynamicPortfolioApps?: LaunchpadData[];
-  openUtility: (title: string, src: string) => void;
+  openUtility: (title: string, src: string, version?: string) => void;
 }
 
 const Spotlight = forwardRef<SpotlightHandle, SpotlightProps>(function Spotlight(
@@ -120,7 +120,7 @@ const Spotlight = forwardRef<SpotlightHandle, SpotlightProps>(function Spotlight
       toggleSpotlight();
     } else {
       if (curDetails.type === "portfolio" && curDetails.id.startsWith("utility-")) {
-        openUtility(curDetails.title, curDetails.link);
+        openUtility(curDetails.title, curDetails.link, curDetails.version);
       } else {
         window.open(curDetails.link);
       }

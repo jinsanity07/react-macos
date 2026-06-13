@@ -29,6 +29,8 @@ interface DesktopState {
   utilityWindow: {
     title: string;
     src: string;
+    version: string;
+    refreshKey: number;
     z: number;
     max: boolean;
     min: boolean;
@@ -158,7 +160,7 @@ export default function Desktop(props: MacActions) {
     setState({ ...state, aboutThisMac: !state.aboutThisMac });
   };
 
-  const openUtility = (title: string, src: string): void => {
+  const openUtility = (title: string, src: string, version?: string): void => {
     setState((prev) => {
       const nextZ = prev.maxZ + 1;
 
@@ -167,6 +169,8 @@ export default function Desktop(props: MacActions) {
         utilityWindow: {
           title,
           src,
+          version: version ?? "v0.0.1",
+          refreshKey: 0,
           z: nextZ,
           max: false,
           min: false
@@ -178,6 +182,24 @@ export default function Desktop(props: MacActions) {
         currentTitle: title
       };
     });
+  };
+
+  const refreshUtility = (): void => {
+    setState((prev) => {
+      if (!prev.utilityWindow) return prev;
+
+      return {
+        ...prev,
+        utilityWindow: {
+          ...prev.utilityWindow,
+          refreshKey: prev.utilityWindow.refreshKey + 1
+        }
+      };
+    });
+  };
+
+  const openUtilityInNewTab = (src: string): void => {
+    window.open(src, "_blank", "noopener,noreferrer");
   };
 
   const closeUtilityWindow = (): void => {
@@ -396,7 +418,11 @@ export default function Desktop(props: MacActions) {
           setMin={setUtilityMin}
           focus={focusUtilityWindow}
         >
-          <UtilityFrame src={state.utilityWindow.src} title={state.utilityWindow.title} />
+          <UtilityFrame
+            src={state.utilityWindow.src}
+            title={state.utilityWindow.title}
+            refreshKey={state.utilityWindow.refreshKey}
+          />
         </AppWindow>
       );
     }
@@ -415,6 +441,17 @@ export default function Desktop(props: MacActions) {
       {/* Top Menu Bar */}
       <TopBar
         title={state.currentTitle}
+        activeUtility={
+          state.utilityWindow
+            ? {
+                title: state.utilityWindow.title,
+                src: state.utilityWindow.src,
+                version: state.utilityWindow.version
+              }
+            : null
+        }
+        refreshUtility={refreshUtility}
+        openUtilityInNewTab={openUtilityInNewTab}
         setLogin={props.setLogin}
         currentUserName={props.currentUserName}
         shutMac={props.shutMac}

@@ -67,6 +67,13 @@ const UsageBoardIcon = ({ size }: { size: number }) => {
 
 interface TopBarProps extends MacActions {
   title: string;
+  activeUtility?: {
+    title: string;
+    src: string;
+    version: string;
+  } | null;
+  refreshUtility?: () => void;
+  openUtilityInNewTab?: (src: string) => void;
   setSpotlightBtnRef: (value: React.RefObject<HTMLDivElement>) => void;
   hide: boolean;
   toggleSpotlight: () => void;
@@ -80,6 +87,7 @@ interface TopBarState {
   showSanityMenu: boolean;
   showWifiMenu: boolean;
   showAppleMenu: boolean;
+  showUtilityMenu: boolean;
 }
 
 const TopBar = (props: TopBarProps) => {
@@ -89,6 +97,7 @@ const TopBar = (props: TopBarProps) => {
   const wifiBtnRef = useRef<HTMLDivElement>(null);
   const spotlightBtnRef = useRef<HTMLDivElement>(null);
   const sanityBtnRef = useRef<HTMLDivElement>(null);
+  const utilityMenuBtnRef = useRef<HTMLDivElement>(null);
 
   const [state, setState] = useState<TopBarState>({
     date: new Date(),
@@ -96,7 +105,8 @@ const TopBar = (props: TopBarProps) => {
     showUsageBoard: false,
     showSanityMenu: false,
     showWifiMenu: false,
-    showAppleMenu: false
+    showAppleMenu: false,
+    showUtilityMenu: false
   });
 
   /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
@@ -133,6 +143,13 @@ const TopBar = (props: TopBarProps) => {
     toggleFullScreen(isFull);
   }, [winWidth, winHeight]);
 
+  // Auto-close the utility menu if the focused utility disappears.
+  useEffect(() => {
+    if (!props.activeUtility && state.showUtilityMenu) {
+      setState((prev) => ({ ...prev, showUtilityMenu: false }));
+    }
+  }, [props.activeUtility, state.showUtilityMenu]);
+
   const setAudioVolume = (value: number): void => {
     setVolume(value);
     controls.volume(value / 100);
@@ -168,6 +185,13 @@ const TopBar = (props: TopBarProps) => {
       ...state,
       showAppleMenu: !state.showAppleMenu
     });
+  };
+
+  const toggleUtilityMenu = (): void => {
+    setState((prev) => ({
+      ...prev,
+      showUtilityMenu: !prev.showUtilityMenu
+    }));
   };
 
   const openAboutThisMac = (): void => {
@@ -217,14 +241,26 @@ const TopBar = (props: TopBarProps) => {
         >
           <span className="i-ri:apple-fill text-base" />
         </TopBarItem>
-        <TopBarItem
-          className="font-semibold px-2"
-          onMouseEnter={() => {
-            if (state.showAppleMenu) toggleAppleMenu();
-          }}
-        >
-          {props.title}
-        </TopBarItem>
+        {props.activeUtility && (
+          <TopBarItem
+            className="font-semibold px-2"
+            forceHover={state.showUtilityMenu}
+            onClick={toggleUtilityMenu}
+            ref={utilityMenuBtnRef}
+          >
+            {props.activeUtility.title}
+          </TopBarItem>
+        )}
+        {!props.activeUtility && (
+          <TopBarItem
+            className="font-semibold px-2"
+            onMouseEnter={() => {
+              if (state.showAppleMenu) toggleAppleMenu();
+            }}
+          >
+            {props.title}
+          </TopBarItem>
+        )}
       </div>
 
       {/* Open this when clicking on Apple logo */}
@@ -238,6 +274,22 @@ const TopBar = (props: TopBarProps) => {
           toggleAppleMenu={toggleAppleMenu}
           btnRef={appleBtnRef}
           currentUserName={props.currentUserName}
+        />
+      )}
+
+      {/* Open this when clicking the focused utility's app-name button */}
+      {state.showUtilityMenu && props.activeUtility && props.refreshUtility && (
+        <UtilityMenu
+          title={props.activeUtility.title}
+          src={props.activeUtility.src}
+          version={props.activeUtility.version}
+          onOpenInNewTab={props.openUtilityInNewTab ?? (() => {})}
+          onRefresh={() => {
+            props.refreshUtility?.();
+            toggleUtilityMenu();
+          }}
+          onClose={toggleUtilityMenu}
+          btnRef={utilityMenuBtnRef}
         />
       )}
 

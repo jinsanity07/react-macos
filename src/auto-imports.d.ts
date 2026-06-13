@@ -29,6 +29,7 @@ declare global {
   const Typora: typeof import('./components/apps/Typora')['default']
   const UsageBoardMenu: typeof import('./components/menus/UsageBoardMenu')['default']
   const UtilityFrame: typeof import('./components/apps/UtilityFrame')['default']
+  const UtilityMenu: typeof import('./components/menus/UtilityMenu')['default']
   const VSCode: typeof import('./components/apps/VSCode')['default']
   const WifiMenu: typeof import('./components/menus/WifiMenu')['default']
   const Window: typeof import('./components/Window')['default']

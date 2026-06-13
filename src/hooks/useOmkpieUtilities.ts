@@ -8,6 +8,7 @@ type UtilitiesStatusResponse = {
     name?: string;
     endpoint?: string;
     status?: string;
+    version?: string;
   }>;
 };
 
@@ -81,7 +82,8 @@ const buildUtilities = (utilities: UtilitiesStatusResponse["utilities"] = []) =>
       title: utility.name as string,
       img: getUtilityIcon(utility.status),
       link: `https://o.mkpie.me${utility.endpoint}`,
-      status: (utility.status as LaunchpadData["status"]) ?? "unknown"
+      status: (utility.status as LaunchpadData["status"]) ?? "unknown",
+      version: utility.version
     }));
 };
 
