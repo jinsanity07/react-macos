@@ -89,7 +89,7 @@ After a code-affecting task completes in this repo (`jinsanity` branch) — a bu
 2. **Commit all changes** (staged + unstaged, including the version bump) with a descriptive message. End the message with a `Co-Authored-By: Claude <noreply@anthropic.com>` trailer.
 3. **Push to `origin/jinsanity`** (the deploy target per `.github/workflows/deploy.yaml`).
 
-A `Stop` hook in `.claude/settings.local.json` injects a reminder into the model's context on every turn end. **Skip this for:** doc-only edits, single-comment or single-line changes, pure conversation, plan-mode work, or turns that only inspected code. If unsure whether the task qualifies as "major", ask the user before bumping/pushing.
+A `Stop` hook in `.claude/settings.local.json` injects a reminder into the model's context on every turn end. The hook is **state-gated**: it scans the current turn's transcript for any `Write|Edit|MultiEdit` tool call, and only injects the reminder if one is found. For pure conversation, doc-only replies, or plan-mode work, the hook returns a silent `{"continue":true}` and the turn ends cleanly — no infinite reminder loop. **Skip this for:** doc-only edits, single-comment or single-line changes, pure conversation, plan-mode work, or turns that only inspected code. If unsure whether the task qualifies as "major", ask the user before bumping/pushing.
 
 Manual exceptions (e.g. squash-merge strategy changes, force-push) require explicit user instruction — never force-push `jinsanity` without confirmation, since the GitHub Pages deploy workflow is triggered on push.
 
