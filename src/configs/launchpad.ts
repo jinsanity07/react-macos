@@ -63,6 +63,12 @@ const launchpadApps: LaunchpadData[] = [
     title: "Activity Monitor",
     img: "https://cdn.jim-nielsen.com/macos/512/activity-monitor-2021-04-22.png?rf=1024",
     link: "https://amz.mkpie.me/d/e5993871-b0ac-4953-a858-c1e3f3c3ffaf/aws?orgId=1&from=now-6h&to=now&timezone=browser"
+  },
+  {
+    id: "utility-ra2web",
+    title: "RA2 Web",
+    img: "https://game.ra2web.com/favicon.ico",
+    link: "https://game.ra2web.com/"
   }
 ];
 
