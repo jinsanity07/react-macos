@@ -115,6 +115,13 @@ const apps: AppsData[] = [
     desktop: false,
     img: "img/icons/github.png",
     link: "https://github.com/codespaces"
+  },
+  {
+    id: "claude",
+    title: "Claude",
+    desktop: false,
+    img: "img/icons/claude.png",
+    link: "https://claude.ai/"
   }
 ];
 
