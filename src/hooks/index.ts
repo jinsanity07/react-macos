@@ -4,3 +4,4 @@ export * from "./useWindowSize";
 export * from "./useAudio";
 export * from "./useBattery";
 export * from "./useBearBlogs";
+export * from "./useBearRssFeeds";

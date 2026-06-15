@@ -92,6 +92,21 @@ const bear: BearData[] = [
         content: "## Loading Blogs\n\nFetching latest posts from RSS feed..."
       }
     ]
+  },
+  {
+    id: "rss-feed",
+    title: "RSS feed",
+    icon: "i-material-symbols:rss-feed-rounded",
+    md: [
+      {
+        id: "rss-feed-loading",
+        title: "Loading RSS feed",
+        file: "",
+        icon: "i-eos-icons:three-dots-loading",
+        excerpt: "Fetching latest posts from 6 RSS sources...",
+        content: "## Loading RSS feed\n\nFetching latest posts from 6 RSS sources..."
+      }
+    ]
   }
 ];
 

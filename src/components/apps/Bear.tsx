@@ -6,7 +6,7 @@ import rehypeExternalLinks from "rehype-external-links";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { dracula, prism } from "react-syntax-highlighter/dist/esm/styles/prism";
 import bear from "~/configs/bear";
-import { useBearBlogs } from "~/hooks";
+import { useBearBlogs, useBearRssFeeds } from "~/hooks";
 import type { BearData, BearMdData } from "~/types";
 
 interface ContentProps {
@@ -125,6 +125,11 @@ const Middlebar = ({ items, cur, setContent }: MiddlebarProps) => {
                 {item.excerpt}
               </div>
             </div>
+            {item.source && (
+              <span className="ml-2 px-1.5 py-0.5 rounded text-xs bg-gray-200 dark:bg-gray-700 text-c-500 whitespace-nowrap">
+                {item.source}
+              </span>
+            )}
             {item.link && (
               <a href={item.link} target="_blank" rel="noreferrer" className="ml-2">
                 <span className="i-ant-design:link-outlined text-c-500" />
@@ -206,6 +211,7 @@ const Content = ({ contentID, contentURL, contentMd }: ContentProps) => {
 
 const Bear = () => {
   const { blogs, loading: blogsLoading, error: blogsError } = useBearBlogs();
+  const { feeds, loading: feedsLoading, error: feedsError } = useBearRssFeeds();
 
   const blogItems = useMemo<BearMdData[]>(() => {
     if (blogsLoading) {
@@ -251,16 +257,45 @@ const Bear = () => {
     return blogs;
   }, [blogs, blogsError, blogsLoading]);
 
+  const feedItems = useMemo<BearMdData[]>(() => {
+    // Only show the error placeholder if EVERY feed failed (the hook
+    // returns `error` only in that case).
+    if (feedsError && feeds.length === 0) {
+      return [
+        {
+          id: "rss-feed-error",
+          title: "RSS feed Unavailable",
+          file: "",
+          icon: "i-material-symbols:error-outline-rounded",
+          excerpt: "Could not load any RSS feeds. Please try again later.",
+          content: `## RSS feed Unavailable\n\n${feedsError}`
+        }
+      ];
+    }
+
+    if (feedsLoading && feeds.length === 0) {
+      return [
+        {
+          id: "rss-feed-loading",
+          title: "Loading RSS feed",
+          file: "",
+          icon: "i-eos-icons:three-dots-loading",
+          excerpt: "Fetching latest posts from 6 RSS sources...",
+          content: "## Loading RSS feed\n\nFetching latest posts from 6 RSS sources..."
+        }
+      ];
+    }
+
+    return feeds;
+  }, [feeds, feedsError, feedsLoading]);
+
   const sidebarItems = useMemo<BearData[]>(() => {
-    return bear.map((item) =>
-      item.id === "blogs"
-        ? {
-            ...item,
-            md: blogItems
-          }
-        : item
-    );
-  }, [blogItems]);
+    return bear.map((item) => {
+      if (item.id === "blogs") return { ...item, md: blogItems };
+      if (item.id === "rss-feed") return { ...item, md: feedItems };
+      return item;
+    });
+  }, [blogItems, feedItems]);
 
   const [state, setState] = useState<BearState>(() => {
     const firstItem = sidebarItems[0].md[0];

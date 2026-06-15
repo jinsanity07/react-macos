@@ -6,6 +6,8 @@ export interface BearMdData {
   excerpt: string;
   link?: string;
   content?: string;
+  source?: string;
+  pubDate?: string;
 }
 
 export interface BearData {
