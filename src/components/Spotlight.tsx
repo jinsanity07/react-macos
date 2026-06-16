@@ -28,6 +28,15 @@ interface SpotlightProps {
   openUtility: (title: string, src: string, version?: string) => void;
 }
 
+// Spotlight selects entries from two sources: in-Dock apps and Portfolio
+// launchpad entries. Each is augmented with a runtime-only `type` field
+// so downstream code can branch on it.
+type SpotlightEntry =
+  | (LaunchpadData & { type: "portfolio" })
+  | (AppsData & { type: "app" });
+
+type SpotlightEntryType = SpotlightEntry["type"];
+
 const Spotlight = forwardRef<SpotlightHandle, SpotlightProps>(function Spotlight(
   {
     toggleSpotlight,
@@ -47,7 +56,7 @@ const Spotlight = forwardRef<SpotlightHandle, SpotlightProps>(function Spotlight
   const [doubleClicked, setDoubleClicked] = useState<boolean>(false);
 
   const [searchText, setSearchText] = useState("");
-  const [curDetails, setCurDetails] = useState<any>(null);
+  const [curDetails, setCurDetails] = useState<SpotlightEntry | null>(null);
 
   const [appIdList, setAppIdList] = useState<string[]>([]);
   const [appList, setAppList] = useState<JSX.Element | null>(null);
@@ -113,6 +122,7 @@ const Spotlight = forwardRef<SpotlightHandle, SpotlightProps>(function Spotlight
   };
 
   const launchSelectedApp = () => {
+    if (!curDetails) return;
     if (curDetails.type === "app" && !curDetails.link) {
       const id = curDetails.id;
       if (id === "launchpad") toggleLaunchpad(true);
@@ -120,7 +130,12 @@ const Spotlight = forwardRef<SpotlightHandle, SpotlightProps>(function Spotlight
       toggleSpotlight();
     } else {
       if (curDetails.type === "portfolio" && curDetails.id.startsWith("utility-")) {
-        openUtility(curDetails.title, curDetails.link, curDetails.version);
+        // `version` is only on LaunchpadData; narrow via a type guard.
+        const version =
+          "version" in curDetails
+            ? (curDetails.version as string | undefined)
+            : undefined;
+        openUtility(curDetails.title, curDetails.link, version);
       } else {
         window.open(curDetails.link);
       }
@@ -128,7 +143,7 @@ const Spotlight = forwardRef<SpotlightHandle, SpotlightProps>(function Spotlight
     }
   };
 
-  const getTypeAppList = (type: string, startIndex: number) => {
+  const getTypeAppList = (type: SpotlightEntryType, startIndex: number) => {
     const result = search(type);
     const typeAppList = [];
     const typeAppIdList = [];
@@ -196,11 +211,10 @@ const Spotlight = forwardRef<SpotlightHandle, SpotlightProps>(function Spotlight
     setAppList(newAppList);
   };
 
-  const setCurrentDetailsWithType = (entry: any, type: string) =>
-    setCurDetails({
-      ...entry,
-      type
-    });
+  const setCurrentDetailsWithType = (
+    entry: LaunchpadData | AppsData,
+    type: SpotlightEntryType
+  ) => setCurDetails({ ...entry, type } as SpotlightEntry);
 
   const updateCurrentDetails = () => {
     if (appIdList.length === 0 || searchText === "") {
@@ -210,12 +224,13 @@ const Spotlight = forwardRef<SpotlightHandle, SpotlightProps>(function Spotlight
 
     const appId = appIdList[selectedIndex];
     const element = document.querySelector(`#spotlight-${appId}`) as HTMLElement;
-    const type = element.dataset.appType as string;
+    const type = (element.dataset.appType as SpotlightEntryType) || "app";
     const source =
       type === "portfolio" ? [...launchpadApps, ...dynamicPortfolioApps] : apps;
     const currentEntry = source.find(
       (item: LaunchpadData | AppsData) => item.id === appId
     );
+    if (!currentEntry) return;
 
     setCurrentDetailsWithType(currentEntry, type);
   };

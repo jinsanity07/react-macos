@@ -15,15 +15,13 @@ export const createUserSlice: StateCreator<UserSlice> = (set) => ({
   setTyporaMd: (v) => set(() => ({ typoraMd: v })),
   faceTimeImages: {},
   addFaceTimeImage: (v) =>
-    set((state) => {
-      const images = state.faceTimeImages;
-      images[+new Date()] = v;
-      return { faceTimeImages: images };
-    }),
+    set((state) => ({
+      faceTimeImages: { ...state.faceTimeImages, [+new Date()]: v }
+    })),
   delFaceTimeImage: (k) =>
     set((state) => {
-      const images = state.faceTimeImages;
-      delete images[k];
-      return { faceTimeImages: images };
+      const next = { ...state.faceTimeImages };
+      delete next[k];
+      return { faceTimeImages: next };
     })
 });

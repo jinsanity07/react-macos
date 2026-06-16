@@ -78,6 +78,7 @@ const TrafficLights = ({ id, close, aspectRatio, max, setMax, setMin }: TrafficP
         className="window-btn bg-red-500 dark:bg-red-400"
         onClick={closeWindow}
         onTouchEnd={closeWindow}
+        aria-label="Close window"
       >
         <span className="icon i-gg:close text-[9px]" />
       </button>
@@ -86,6 +87,7 @@ const TrafficLights = ({ id, close, aspectRatio, max, setMax, setMin }: TrafficP
         onClick={() => setMin(id)}
         onTouchEnd={() => setMin(id)}
         disabled={max}
+        aria-label="Minimize window"
       >
         <span className={`icon i-fe:minus text-[10px] ${max ? "invisible" : ""}`} />
       </button>
@@ -96,6 +98,7 @@ const TrafficLights = ({ id, close, aspectRatio, max, setMax, setMin }: TrafficP
         onClick={() => setMax(id)}
         onTouchEnd={() => setMax(id)}
         disabled={disableMax}
+        aria-label={max ? "Restore window" : "Maximize window"}
       >
         {!disableMax && (max ? <ExitFullIcon size={9} /> : <FullIcon size={6} />)}
       </button>
@@ -120,11 +123,13 @@ const Window = (props: WindowProps) => {
   });
 
   useEffect(() => {
-    setState({
-      ...state,
-      width: Math.min(winWidth, state.width),
-      height: Math.min(winHeight, state.height)
-    });
+    setState((prev) => ({
+      ...prev,
+      // Only clamp the upper bound — a previously-enlarged window should
+      // keep its size when the viewport grows again.
+      width: Math.min(prev.width, winWidth),
+      height: Math.min(prev.height, winHeight)
+    }));
   }, [winWidth, winHeight]);
 
   const round = props.max ? "rounded-none" : "rounded-lg";
@@ -167,16 +172,17 @@ const Window = (props: WindowProps) => {
               Math.max(0, state.y)
             )
       }}
-      onDragStop={(e, d) => {
-        setState({ ...state, x: d.x, y: d.y });
+      onDragStop={(_e, d) => {
+        setState((prev) => ({ ...prev, x: d.x, y: d.y }));
       }}
-      onResizeStop={(e, direction, ref, delta, position) => {
-        setState({
-          ...state,
-          width: parseInt(ref.style.width),
-          height: parseInt(ref.style.height),
-          ...position
-        });
+      onResizeStop={(_e, _direction, ref, _delta, position) => {
+        setState((prev) => ({
+          ...prev,
+          width: parseInt(ref.style.width, 10),
+          height: parseInt(ref.style.height, 10),
+          x: position.x,
+          y: position.y
+        }));
       }}
       minWidth={props.minWidth ? props.minWidth : 200}
       minHeight={props.minHeight ? props.minHeight : 150}

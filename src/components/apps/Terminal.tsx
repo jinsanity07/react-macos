@@ -88,8 +88,8 @@ export default class Terminal extends React.Component<{}, TerminalState> {
   private history = [] as string[];
   private curHistory = 0;
   private curInputTimes = 0;
-  private curDirPath = [] as any;
-  private curChildren = terminal as any;
+  private curDirPath: string[] = [];
+  private curChildren: TerminalData[] = terminal;
   private commands: {
     [key: string]: { (): void } | { (arg?: string): void };
   };
@@ -123,9 +123,10 @@ export default class Terminal extends React.Component<{}, TerminalState> {
   addRow = (row: JSX.Element) => {
     if (this.state.content.find((item) => item.key === row.key)) return;
 
-    const content = this.state.content;
-    content.push(row);
-    this.setState({ content });
+    // Use a functional setState with concat so the new array reference
+    // triggers React's commit (the previous code mutated the array in
+    // place, which React's bail-out skipped).
+    this.setState((prev) => ({ content: prev.content.concat(row) }));
   };
 
   getCurDirName = () => {
@@ -133,12 +134,14 @@ export default class Terminal extends React.Component<{}, TerminalState> {
     else return this.curDirPath[this.curDirPath.length - 1];
   };
 
-  getCurChildren = () => {
-    let children = terminal as any;
+  getCurChildren = (): TerminalData[] => {
+    let children: TerminalData[] = terminal;
     for (const name of this.curDirPath) {
-      children = children.find((item: TerminalData) => {
+      const folder = children.find((item) => {
         return item.title === name && item.type === "folder";
-      }).children;
+      });
+      if (!folder || !folder.children) return terminal;
+      children = folder.children;
     }
     return children;
   };
@@ -168,6 +171,13 @@ export default class Terminal extends React.Component<{}, TerminalState> {
           <span>{`cd: no such file or directory: ${args}`}</span>
         );
       } else {
+        if (!target.children) {
+          this.generateResultRow(
+            this.curInputTimes,
+            <span>{`cd: no such file or directory: ${args}`}</span>
+          );
+          return;
+        }
         this.curChildren = target.children;
         this.curDirPath.push(target.title);
       }

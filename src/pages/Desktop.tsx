@@ -167,7 +167,10 @@ export default function Desktop(props: MacActions) {
   };
 
   const toggleAboutThisMac = (): void => {
-    setState({ ...state, aboutThisMac: !state.aboutThisMac });
+    setState((prev) => ({
+      ...prev,
+      aboutThisMac: !prev.aboutThisMac
+    }));
   };
 
   const openUtility = (title: string, src: string, version?: string): void => {
@@ -300,23 +303,23 @@ export default function Desktop(props: MacActions) {
   };
 
   const setAppMax = (id: string, target?: boolean): void => {
-    const maxApps = state.maxApps;
-    if (target === undefined) target = !maxApps[id];
-    maxApps[id] = target;
-    setState({
-      ...state,
-      maxApps: maxApps,
-      hideDockAndTopbar: target
+    setState((prev) => {
+      const nextTarget = target === undefined ? !prev.maxApps[id] : target;
+      return {
+        ...prev,
+        maxApps: { ...prev.maxApps, [id]: nextTarget },
+        hideDockAndTopbar: nextTarget
+      };
     });
   };
 
   const setAppMin = (id: string, target?: boolean): void => {
-    const minApps = state.minApps;
-    if (target === undefined) target = !minApps[id];
-    minApps[id] = target;
-    setState({
-      ...state,
-      minApps: minApps
+    setState((prev) => {
+      const nextTarget = target === undefined ? !prev.minApps[id] : target;
+      return {
+        ...prev,
+        minApps: { ...prev.minApps, [id]: nextTarget }
+      };
     });
   };
 
@@ -343,53 +346,48 @@ export default function Desktop(props: MacActions) {
 
   const closeApp = (id: string): void => {
     setAppMax(id, false);
-    const showApps = state.showApps;
-    showApps[id] = false;
-    setState({
-      ...state,
-      showApps: showApps,
+    setState((prev) => ({
+      ...prev,
+      showApps: { ...prev.showApps, [id]: false },
       hideDockAndTopbar: false
-    });
+    }));
   };
 
   const openApp = (id: string): void => {
-    // add it to the shown app list
-    const showApps = state.showApps;
-    showApps[id] = true;
-
-    // move to the top (use a maximum z-index)
-    const appsZ = state.appsZ;
-    const maxZ = state.maxZ + 1;
-    appsZ[id] = maxZ;
-
-    // get the title of the currently opened app
-    const currentApp = apps.find((app) => {
-      return app.id === id;
-    });
+    const currentApp = apps.find((app) => app.id === id);
     if (currentApp === undefined) {
       throw new TypeError(`App ${id} is undefined.`);
     }
 
-    setState({
-      ...state,
-      showApps: showApps,
-      appsZ: appsZ,
-      maxZ: maxZ,
-      currentTitle: currentApp.title
+    // Pre-compute the DOM side-effect target: was this app minimized
+    // before this click? The CSS transform depends on the *previous*
+    // minApps[id], which is exactly what the closure-snapshot `state`
+    // read below captures.
+    const wasMinimized = state.minApps[id];
+
+    setState((prev) => {
+      const nextZ = prev.maxZ + 1;
+      return {
+        ...prev,
+        showApps: { ...prev.showApps, [id]: true },
+        appsZ: { ...prev.appsZ, [id]: nextZ },
+        maxZ: nextZ,
+        minApps: {
+          ...prev.minApps,
+          [id]: wasMinimized ? false : prev.minApps[id]
+        },
+        currentTitle: currentApp.title
+      };
     });
 
-    const minApps = state.minApps;
-    // if the app has already been shown but minimized
-    if (minApps[id]) {
-      // move to window's last position
+    // If the app was previously minimized, restore its last window
+    // position via a CSS transform (matches the original behavior).
+    if (wasMinimized) {
       const r = document.querySelector(`#window-${id}`) as HTMLElement;
       r.style.transform = `translate(${r.style.getPropertyValue(
         "--window-transform-x"
       )}, ${r.style.getPropertyValue("--window-transform-y")}) scale(1)`;
       r.style.transition = "ease-in 0.3s";
-      // remove it from the minimized app list
-      minApps[id] = false;
-      setState({ ...state, minApps });
     }
   };
 
@@ -541,6 +539,7 @@ export default function Desktop(props: MacActions) {
         toggleLaunchpad={toggleLaunchpad}
         currentUserAvatar={props.currentUserAvatar}
         openUtility={openUtility}
+        dynamicPortfolioApps={dynamicLaunchpadApps}
       />
 
       {/* Dock */}

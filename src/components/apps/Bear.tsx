@@ -1,4 +1,4 @@
-import ReactMarkdown from "react-markdown";
+import ReactMarkdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
@@ -33,24 +33,16 @@ interface BearState extends ContentProps {
   midbarList: BearMdData[];
 }
 
-const Highlighter = (dark: boolean): any => {
-  interface codeProps {
-    node: any;
-    inline: boolean;
-    className: string;
-    children: any;
-  }
-
+const Highlighter = (dark: boolean): Pick<Components, "code"> => {
+  // `react-syntax-highlighter`'s style prop types as a flat record, but the
+  // dual `StyleHTMLAttributes` and react-markdown `Components["code"]` props
+  // can leak `CSSProperties` into it; cast at the prop boundary.
+  const codeStyle = (dark ? dracula : prism) as Record<string, React.CSSProperties>;
   return {
-    code({ node, inline, className, children, ...props }: codeProps) {
+    code({ inline, className, children, ...props }) {
       const match = /language-(\w+)/.exec(className || "");
       return !inline && match ? (
-        <SyntaxHighlighter
-          style={dark ? dracula : prism}
-          language={match[1]}
-          PreTag="div"
-          {...props}
-        >
+        <SyntaxHighlighter style={codeStyle} language={match[1]} PreTag="div" {...props}>
           {String(children).replace(/\n$/, "")}
         </SyntaxHighlighter>
       ) : (
@@ -196,29 +188,38 @@ const fixImageURL = (text: string, contentURL: string): string => {
 };
 
 const Content = ({ contentID, contentURL, contentMd }: ContentProps) => {
-  const [storeMd, setStoreMd] = useState<{ [key: string]: string }>({});
+  const [storeMd, setStoreMd] = useState<Record<string, string>>({});
+  // Track cached ids outside React state so the effect's dep array can
+  // stay small and the cache check is decoupled from re-renders.
+  const cacheRef = useRef<Set<string>>(new Set());
+  const inflightRef = useRef<AbortController | null>(null);
   const dark = useStore((state) => state.dark);
-
-  const fetchMarkdown = useCallback(
-    (id: string, url: string) => {
-      if (!url) return;
-      if (!storeMd[id]) {
-        fetch(url)
-          .then((response) => response.text())
-          .then((text) => {
-            storeMd[id] = fixImageURL(text, url);
-            setStoreMd({ ...storeMd });
-          })
-          .catch((error) => console.error(error));
-      }
-    },
-    [storeMd]
-  );
 
   useEffect(() => {
     if (contentMd !== undefined) return;
-    fetchMarkdown(contentID, contentURL);
-  }, [contentID, contentURL, contentMd, fetchMarkdown]);
+    if (!contentURL) return;
+    if (cacheRef.current.has(contentID)) return;
+
+    // Cancel any in-flight request before starting a new one.
+    inflightRef.current?.abort();
+    const ac = new AbortController();
+    inflightRef.current = ac;
+
+    fetch(contentURL, { signal: ac.signal })
+      .then((response) => response.text())
+      .then((text) => {
+        cacheRef.current.add(contentID);
+        setStoreMd((prev) => ({
+          ...prev,
+          [contentID]: fixImageURL(text, contentURL)
+        }));
+      })
+      .catch((error) => {
+        if (error?.name !== "AbortError") console.error(error);
+      });
+
+    return () => ac.abort();
+  }, [contentID, contentURL, contentMd]);
 
   return (
     <div className="markdown w-2/3 mx-auto px-2 py-6 text-c-700">
@@ -228,7 +229,7 @@ const Content = ({ contentID, contentURL, contentMd }: ContentProps) => {
           rehypeKatex,
           [rehypeExternalLinks, { target: "_blank", rel: "noopener noreferrer" }]
         ]}
-        components={Highlighter(dark as boolean)}
+        components={Highlighter(dark)}
       >
         {contentMd ?? storeMd[contentID]}
       </ReactMarkdown>
