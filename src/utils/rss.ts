@@ -307,13 +307,26 @@ export const mapRssJina = (mdText: string, source: string): BearMdData[] => {
     if (usedIds.has(id)) id = `${id}-${index}`;
     usedIds.add(id);
 
-    const content = [
-      d.pubDate ? `Published: ${d.pubDate}` : "",
-      cleanBody,
-      d.link ? `## Read Full Article\n\n[${d.link}](${d.link})` : ""
-    ]
-      .filter(Boolean)
-      .join("\n\n");
+    // Right-pane content is a structured "card" view: title at the top
+    // (as an H1), source + pubDate metadata, then the body when
+    // available (LWN / The Guardian) or the excerpt as a fallback
+    // (Hacker News / Ars Technica, whose jina response has no prose
+    // beyond the URL echo). Read Full Article link at the bottom.
+    const cardParts: string[] = [];
+    cardParts.push(`# ${title}`);
+
+    const metaLines: string[] = [`**Source:** ${source}`];
+    if (d.pubDate) metaLines.push(`**Published:** ${d.pubDate}`);
+    cardParts.push(metaLines.join("  \n"));
+
+    const mainContent = cleanBody || excerpt || title;
+    cardParts.push(mainContent);
+
+    if (d.link) {
+      cardParts.push(`## Read Full Article\n\n[${d.link}](${d.link})`);
+    }
+
+    const content = cardParts.join("\n\n");
 
     return {
       id,

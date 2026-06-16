@@ -15,24 +15,21 @@ export type RssFeedSource = {
 const JINA_PROXY_PREFIX = "https://r.jina.ai/";
 
 /**
- * The 6 RSS feeds shown in the Bear "RSS feed" sidebar section.
+ * The 5 RSS feeds shown in the Bear "RSS feed" sidebar section.
  *
  * The list is passed to jina as-is — jina fetches the feed
  * server-side, dodging both Mixed Content (HTTPS origin can fetch
  * HTTP feeds) and CORS (jina sets the right headers for us). Per-feed
- * failures are silently dropped by the hook; if ALL 6 fail, the
+ * failures are silently dropped by the hook; if ALL 5 fail, the
  * "RSS feed Unavailable" placeholder is shown.
  *
  * URL notes:
  *  - The Guardian: the original `/uk/rss` returns an empty body via
  *    jina, so we use `/world/rss` instead.
- *  - BBC News: the original `video_and_audio/...rss.xml` 404s; we use
- *    the canonical `/news/rss.xml` (works via jina, returns top
- *    headlines).
  *  - Reuters: the original `feeds.reuters.com/Reuters/worldNews` is
  *    DNS-blocked by jina. We keep it in the list (per the user's
  *    stated sources) and let per-feed error isolation drop it; the
- *    remaining 5 feeds still populate the section.
+ *    remaining feeds still populate the section.
  *  - All URLs are HTTPS so the request is well-formed even if a
  *    future change fetches directly.
  */
@@ -44,7 +41,6 @@ export const BEAR_RSS_FEED_SOURCES: RssFeedSource[] = [
   },
   { name: "The Guardian", url: "https://www.theguardian.com/world/rss" },
   { name: "LWN", url: "https://lwn.net/headlines/newrss" },
-  { name: "BBC News", url: "https://feeds.bbci.co.uk/news/rss.xml" },
   { name: "Reuters", url: "https://feeds.reuters.com/Reuters/worldNews" }
 ];
 

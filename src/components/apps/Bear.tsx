@@ -307,8 +307,8 @@ const Bear = () => {
           title: "Loading RSS feed",
           file: "",
           icon: "i-eos-icons:three-dots-loading",
-          excerpt: "Fetching latest posts from 6 RSS sources...",
-          content: "## Loading RSS feed\n\nFetching latest posts from 6 RSS sources..."
+          excerpt: "Fetching latest posts from 5 RSS sources...",
+          content: "## Loading RSS feed\n\nFetching latest posts from 5 RSS sources..."
         }
       ];
     }
