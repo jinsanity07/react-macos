@@ -48,7 +48,15 @@ export const BEAR_RSS_FEED_SOURCES: RssFeedSource[] = [
   { name: "Reuters", url: "https://feeds.reuters.com/Reuters/worldNews" }
 ];
 
-export const BEAR_RSS_FEED_LIMIT = 5;
+/**
+ * Cap applied per source — the user asked for "5 most recent feed to
+ * from the given list of the feed", which reads as 5 per feed, not
+ * 5 global. So a feed that returns 20 items gets trimmed to its
+ * freshest 5, and the section ends up with up to
+ * `BEAR_RSS_FEED_SOURCES.length * BEAR_RSS_FEED_PER_SOURCE` items
+ * (currently 6 × 5 = 30 max).
+ */
+export const BEAR_RSS_FEED_PER_SOURCE = 5;
 
 const pubDateToMs = (isoOrRfc: string): number => {
   if (!isoOrRfc) return 0;
@@ -56,23 +64,47 @@ const pubDateToMs = (isoOrRfc: string): number => {
   return Number.isFinite(ms) ? ms : 0;
 };
 
+const sortByDateDesc = (items: BearMdData[]): BearMdData[] =>
+  [...items].sort((a, b) => pubDateToMs(b.pubDate || "") - pubDateToMs(a.pubDate || ""));
+
 /**
- * Merge a fresh batch of items into the running list, sort by
- * `pubDate` desc, and cap at the limit.
+ * Take the 5 most-recent items from a single feed response. The
+ * `prev`/`next` shape is preserved (instead of a plain slice) so the
+ * hook can keep its single functional `setFeeds` call.
+ */
+const trimPerSource = (items: BearMdData[]): BearMdData[] =>
+  sortByDateDesc(items).slice(0, BEAR_RSS_FEED_PER_SOURCE);
+
+/**
+ * Merge a fresh batch of items into the running list, dedupe by id,
+ * sort by `pubDate` desc, and cap per source. Replaces the previous
+ * "5 global items" cap with a "5 per source" cap.
  */
 const mergeByDateDesc = (prev: BearMdData[], next: BearMdData[]): BearMdData[] => {
   const seen = new Set(prev.map((item) => item.id));
   const additions = next.filter((item) => !seen.has(item.id));
   if (additions.length === 0) return prev;
 
-  const combined = [...prev, ...additions];
-  combined.sort((a, b) => {
-    const aMs = pubDateToMs(a.pubDate || "");
-    const bMs = pubDateToMs(b.pubDate || "");
-    return bMs - aMs;
-  });
+  // Group by source, sort each group, cap each at the per-source
+  // limit, then concatenate back into a single list (preserving the
+  // Bear middle-column's flat list shape).
+  const bySource = new Map<string, BearMdData[]>();
+  for (const item of prev) {
+    const key = item.source || "";
+    if (!bySource.has(key)) bySource.set(key, []);
+    bySource.get(key)!.push(item);
+  }
+  for (const item of additions) {
+    const key = item.source || "";
+    if (!bySource.has(key)) bySource.set(key, []);
+    bySource.get(key)!.push(item);
+  }
 
-  return combined.slice(0, BEAR_RSS_FEED_LIMIT);
+  const merged: BearMdData[] = [];
+  for (const [, group] of bySource) {
+    merged.push(...trimPerSource(group));
+  }
+  return merged;
 };
 
 export function useBearRssFeeds() {

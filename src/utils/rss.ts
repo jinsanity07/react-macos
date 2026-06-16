@@ -163,10 +163,9 @@ export const mapRssJina = (mdText: string, source: string): BearMdData[] => {
     const m = line.match(itemHeader);
     if (m) {
       if (current) drafts.push(current);
-      const title = m[1].trim() || `Untitled Post ${drafts.length + 1}`;
       current = {
         index: drafts.length,
-        title,
+        title: m[1].trim(),
         link: m[2].trim(),
         pubDate: "",
         bodyLines: []
@@ -185,25 +184,33 @@ export const mapRssJina = (mdText: string, source: string): BearMdData[] => {
   if (current) drafts.push(current);
 
   return drafts.map((d, index) => {
-    const body = d.bodyLines
-      // jina echoes the link again on a line of its own right after
-      // the heading — strip that duplicate, but keep any other body
-      // content (paragraphs, sub-headings, etc.) untouched.
+    // jina echoes the link again on a line of its own right after
+    // the heading — strip that duplicate. Any non-empty first
+    // paragraph (or first heading) becomes the fallback title for
+    // feeds where jina renders `### [](url)` with an empty alt
+    // text (e.g. BBC News).
+    const cleanBody = d.bodyLines
       .filter((l) => l.trim() !== d.link && l.trim() !== `<${d.link}>`)
       .join("\n")
       .replace(/\n{3,}/g, "\n\n")
       .trim();
 
-    const summary = stripHtml(body || d.title);
+    const fallbackTitle = cleanBody
+      .split(/\n\n+/)
+      .map((p) => p.trim())
+      .find((p) => p && p !== d.link && !p.startsWith("[") && !p.startsWith("!"));
+    const title = d.title || fallbackTitle || `Untitled Post ${index + 1}`;
+
+    const summary = stripHtml(cleanBody || title);
     const excerpt = summary.slice(0, 140) + (summary.length > 140 ? "..." : "");
 
-    let id = toFeedId(source, d.link || d.title, index);
+    let id = toFeedId(source, d.link || title, index);
     if (usedIds.has(id)) id = `${id}-${index}`;
     usedIds.add(id);
 
     const content = [
       d.pubDate ? `Published: ${d.pubDate}` : "",
-      body,
+      cleanBody,
       d.link ? `## Read Full Article\n\n[${d.link}](${d.link})` : ""
     ]
       .filter(Boolean)
@@ -211,7 +218,7 @@ export const mapRssJina = (mdText: string, source: string): BearMdData[] => {
 
     return {
       id,
-      title: d.title,
+      title,
       file: d.link,
       icon: "i-material-symbols:rss-feed-rounded",
       excerpt: excerpt || "No excerpt available.",
