@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { BearMdData } from "~/types";
-import { mapRssItems } from "~/utils/rss";
+import { mapRssXml } from "~/utils/rss";
 
 const BEAR_BLOG_RSS_URL = "https://jinsanity07git.github.io/blog//rss.xml";
 const BEAR_BLOG_SOURCE = "Jinsanity Blog";
@@ -22,7 +22,7 @@ export function useBearBlogs() {
         if (!res.ok) throw new Error("Failed to load RSS feed.");
 
         const rssText = await res.text();
-        const mappedBlogs = mapRssItems(rssText, BEAR_BLOG_SOURCE);
+        const mappedBlogs = mapRssXml(rssText, BEAR_BLOG_SOURCE);
 
         if (!cancelled) setBlogs(mappedBlogs);
       } catch (e) {
