@@ -90,31 +90,41 @@ const Middlebar = ({ items, cur, setContent }: MiddlebarProps) => {
 
   return (
     <ul>
-      {items.map((item: BearMdData, index: number) => (
-        <li
-          key={`bear-midbar-${item.id}`}
-          className={`min-h-[48px] flex flex-col justify-center cursor-default border-l-2 px-3 py-2 ${
-            cur === index
-              ? "border-red-500 bg-white dark:bg-gray-900"
-              : "border-transparent bg-transparent"
-          } hover:(bg-white dark:bg-gray-900)`}
-          onClick={() => setContent(item, index)}
-        >
-          <div className="flex items-center w-full">
-            <div className="w-8 vstack text-c-500 flex-shrink-0">
-              <span className={item.icon} />
-            </div>
-            <div className="flex-1 min-w-0 ml-2">
-              <div
-                className={`truncate font-medium ${
-                  dark ? "text-gray-100" : "text-gray-900"
-                }`}
-                title={item.title}
-              >
-                {item.title}
+      {items.map((item: BearMdData, index: number) => {
+        const sourceClass = item.source ? sourceColorClass(item.source) : "";
+        return (
+          <li
+            key={`bear-midbar-${item.id}`}
+            data-midbar-item
+            data-midbar-index={index}
+            className={`min-h-[48px] flex cursor-default border-l-4 px-3 py-2 ${
+              cur === index
+                ? "border-red-500 bg-white dark:bg-gray-900"
+                : `${sourceClass || "border-transparent"} bg-transparent`
+            } hover:(bg-white dark:bg-gray-900)`}
+            onClick={() => setContent(item, index)}
+          >
+            <div className="flex flex-col justify-center min-w-0 flex-1">
+              <div className="flex items-baseline gap-2 min-w-0">
+                {item.source && (
+                  <span
+                    className="text-[10px] font-semibold tracking-wider uppercase text-c-500 flex-shrink-0"
+                    title={item.source}
+                  >
+                    {item.source}
+                  </span>
+                )}
+                <div
+                  className={`truncate font-medium text-sm ${
+                    dark ? "text-gray-100" : "text-gray-900"
+                  }`}
+                  title={item.title}
+                >
+                  {item.title}
+                </div>
               </div>
               <div
-                className="hidden md:block text-sm text-c-500 mt-1"
+                className="text-xs text-c-500 mt-1"
                 style={{
                   display: "-webkit-box",
                   WebkitLineClamp: 2,
@@ -125,21 +135,38 @@ const Middlebar = ({ items, cur, setContent }: MiddlebarProps) => {
                 {item.excerpt}
               </div>
             </div>
-            {item.source && (
-              <span className="ml-2 px-1.5 py-0.5 rounded text-xs bg-gray-200 dark:bg-gray-700 text-c-500 whitespace-nowrap">
-                {item.source}
-              </span>
-            )}
             {item.link && (
-              <a href={item.link} target="_blank" rel="noreferrer" className="ml-2">
+              <a
+                href={item.link}
+                target="_blank"
+                rel="noreferrer"
+                className="ml-2 self-start mt-1 flex-shrink-0"
+                onClick={(e) => e.stopPropagation()}
+              >
                 <span className="i-ant-design:link-outlined text-c-500" />
               </a>
             )}
-          </div>
-        </li>
-      ))}
+          </li>
+        );
+      })}
     </ul>
   );
+};
+
+/**
+ * Per-source left-border color for RSS feed rows. Used when the row
+ * is NOT the currently-selected one (the selected row keeps the
+ * red-500 left border for focus parity with the other Bear sections).
+ */
+const sourceColorClass = (source: string): string => {
+  const s = source.toLowerCase();
+  if (s.includes("hacker")) return "border-l-orange-500";
+  if (s.includes("ars")) return "border-l-teal-500";
+  if (s.includes("guardian")) return "border-l-blue-500";
+  if (s.includes("lwn")) return "border-l-green-500";
+  if (s.includes("bbc")) return "border-l-red-600";
+  if (s.includes("reuters")) return "border-l-orange-700";
+  return "border-l-gray-400";
 };
 
 const getRepoURL = (url: string) => {
@@ -368,12 +395,43 @@ const Bear = () => {
     }));
   };
 
+  // Keyboard navigation for the middle column. Only active when the
+  // RSS feed sidebar entry is selected — other Bear sections (Profile,
+  // Projects, Blogs) keep their click-only behavior.
+  const isRssActive = sidebarItems[state.curSidebar]?.id === "rss-feed";
+  const handleMidbarKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (!isRssActive) return;
+    if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
+    e.preventDefault();
+    const list = state.midbarList;
+    if (list.length === 0) return;
+    const dir = e.key === "ArrowDown" ? 1 : -1;
+    const nextIndex = Math.max(0, Math.min(list.length - 1, state.curMidbar + dir));
+    if (nextIndex === state.curMidbar) return;
+    setContent(list[nextIndex], nextIndex);
+
+    // Keep the focused item in view inside the scrollable middle column.
+    requestAnimationFrame(() => {
+      const el = (e.currentTarget as HTMLDivElement).querySelector<HTMLElement>(
+        `[data-midbar-index="${nextIndex}"]`
+      );
+      el?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    });
+  };
+
   return (
     <div className="bear font-avenir flex h-full">
       <div className="w-44 overflow-auto bg-gray-700">
         <Sidebar items={sidebarItems} cur={state.curSidebar} setMidBar={setMidBar} />
       </div>
-      <div className="w-60 overflow-auto" bg="gray-50 dark:gray-800" border="r c-300">
+      <div
+        className="w-72 overflow-auto focus:outline-none"
+        bg="gray-50 dark:gray-800"
+        border="r c-300"
+        tabIndex={0}
+        onKeyDown={handleMidbarKeyDown}
+        data-midbar-list
+      >
         <Middlebar
           items={state.midbarList}
           cur={state.curMidbar}
