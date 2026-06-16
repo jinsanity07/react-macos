@@ -12,7 +12,7 @@ type UtilitiesStatusResponse = {
   }>;
 };
 
-const GUEST_UTILITY_FALLBACK: NonNullable<UtilitiesStatusResponse["utilities"]> = [
+export const GUEST_UTILITY_FALLBACK: NonNullable<UtilitiesStatusResponse["utilities"]> = [
   {
     key: "gasana",
     name: "Asana",
@@ -69,12 +69,12 @@ const GUEST_UTILITY_FALLBACK: NonNullable<UtilitiesStatusResponse["utilities"]> 
   }
 ];
 
-const getUtilityIcon = (status?: string) => {
+export const getUtilityIcon = (status?: string) => {
   if (status === "running") return "img/icons/launchpad/flint.png";
   return "img/icons/launchpad/gungnir.png";
 };
 
-const buildUtilities = (utilities: UtilitiesStatusResponse["utilities"] = []) => {
+export const buildUtilities = (utilities: UtilitiesStatusResponse["utilities"] = []) => {
   return utilities
     .filter((utility) => utility.key && utility.name && utility.endpoint)
     .map((utility) => ({
@@ -87,7 +87,7 @@ const buildUtilities = (utilities: UtilitiesStatusResponse["utilities"] = []) =>
     }));
 };
 
-const isOmkpieSession = (currentUserAvatar?: string) => {
+export const isOmkpieSession = (currentUserAvatar?: string) => {
   return currentUserAvatar !== undefined && currentUserAvatar !== user.avatar;
 };
 

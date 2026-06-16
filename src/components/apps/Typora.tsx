@@ -6,16 +6,27 @@ import { history } from "@milkdown/plugin-history";
 import { listener, listenerCtx } from "@milkdown/plugin-listener";
 
 const MilkdownEditor = () => {
-  const { typoraMd, setTyporaMd } = useStore((state) => ({
-    typoraMd: state.typoraMd,
-    setTyporaMd: state.setTyporaMd
-  }));
+  // Select individually so the selector identity stays stable across renders.
+  const typoraMd = useStore((s) => s.typoraMd);
+  const setTyporaMd = useStore((s) => s.setTyporaMd);
+
+  // Mirror the latest values into refs so the useEditor config (which runs
+  // once on mount) can read the current typoraMd and write through the current
+  // setTyporaMd without re-binding.
+  const typoraMdRef = useRef(typoraMd);
+  const setTyporaMdRef = useRef(setTyporaMd);
+  useEffect(() => {
+    typoraMdRef.current = typoraMd;
+  }, [typoraMd]);
+  useEffect(() => {
+    setTyporaMdRef.current = setTyporaMd;
+  }, [setTyporaMd]);
 
   useEditor((root) =>
     Editor.make()
       .config((ctx) => {
         ctx.set(rootCtx, root);
-        ctx.set(defaultValueCtx, typoraMd);
+        ctx.set(defaultValueCtx, typoraMdRef.current);
         ctx
           .get(listenerCtx)
           .mounted((ctx) => {
@@ -25,7 +36,7 @@ const MilkdownEditor = () => {
             ) as HTMLDivElement;
             wrapper.onclick = () => editor?.focus();
           })
-          .markdownUpdated((_, markdown) => setTyporaMd(markdown));
+          .markdownUpdated((_, markdown) => setTyporaMdRef.current(markdown));
 
         root.className =
           "typora bg-white dark:bg-gray-800 text-c-700 h-full overflow-y-scroll";

@@ -171,18 +171,22 @@ const Safari = ({ width }: SafariProps) => {
           <button
             className={`safari-btn w-7 ${buttonColor}`}
             onClick={() => setGoURL("")}
+            aria-label="Back"
           >
             <span className="i-jam:chevron-left text-xl" />
           </button>
-          <button className="safari-btn w-7 text-c-400">
+          <button className="safari-btn w-7 text-c-400" aria-label="Forward">
             <span className="i-jam:chevron-right text-xl" />
           </button>
-          <button className="safari-btn w-9 ml-3 text-c-700">
+          <button className="safari-btn w-9 ml-3 text-c-700" aria-label="Toggle sidebar">
             <span className="i-bi:layout-sidebar text-sm" />
           </button>
         </div>
         <div className="hstack space-x-2 px-2">
-          <button className="safari-btn w-9 -ml-10 text-c-400">
+          <button
+            className="safari-btn w-9 -ml-10 text-c-400"
+            aria-label="Privacy report"
+          >
             <span className="i-fa-solid:shield-alt text-sm" />
           </button>
           <input
@@ -193,13 +197,14 @@ const Safari = ({ width }: SafariProps) => {
             className="h-6 w-full p-2 rounded font-normal no-outline text-sm text-center text-c-500 bg-c-200"
             border="2 transparent focus:blue-400 dark:focus:blue-500"
             placeholder="Search or enter website name"
+            aria-label="Search or enter website name"
           />
         </div>
         <div className={`${hideLast} justify-end space-x-2 px-2`}>
-          <button className={`safari-btn w-9 ${buttonColor}`}>
+          <button className={`safari-btn w-9 ${buttonColor}`} aria-label="Share">
             <span className="i-ion:share-outline" />
           </button>
-          <button className="safari-btn w-9 text-c-700">
+          <button className="safari-btn w-9 text-c-700" aria-label="Copy link">
             <span className="i-ion:copy-outline" />
           </button>
         </div>
