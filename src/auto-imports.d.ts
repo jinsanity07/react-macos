@@ -10,6 +10,7 @@ declare global {
   const AppWindow: typeof import('./components/AppWindow')['default']
   const AppleMenu: typeof import('./components/menus/AppleMenu')['default']
   const BEAR_RSS_FEED_LIMIT: typeof import('./hooks/useBearRssFeeds')['BEAR_RSS_FEED_LIMIT']
+  const BEAR_RSS_FEED_PER_SOURCE: typeof import('./hooks/useBearRssFeeds')['BEAR_RSS_FEED_PER_SOURCE']
   const BEAR_RSS_FEED_SOURCES: typeof import('./hooks/useBearRssFeeds')['BEAR_RSS_FEED_SOURCES']
   const Battery: typeof import('./components/menus/Battery')['default']
   const Bear: typeof import('./components/apps/Bear')['default']

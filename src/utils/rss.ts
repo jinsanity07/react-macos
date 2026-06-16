@@ -40,6 +40,85 @@ export const toFeedId = (source: string, seed: string, index: number): string =>
   return seedSlug ? `rss-${sourceSlug}-${seedSlug}` : `rss-${sourceSlug}-${index}`;
 };
 
+const escapeRegex = (s: string): string => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+/**
+ * Check if a line is essentially just a URL echo (in any of: bare,
+ * angle-bracketed, or markdown link form). Used to filter out jina's
+ * habit of repeating the article URL on its own line right after the
+ * `### [title](url)` header — and to skip empty separator lines.
+ */
+const isUrlEcho = (line: string, url: string): boolean => {
+  const t = line.trim();
+  if (!t) return true;
+  if (!url) return false;
+  const urlRe = escapeRegex(url);
+  return (
+    new RegExp(`^\\[\\s*<?${urlRe}>?\\s*\\]\\(\\s*<?${urlRe}>?\\s*\\)$`).test(t) ||
+    new RegExp(`^\\s*<${urlRe}>\\s*$`).test(t) ||
+    new RegExp(`^\\s*${urlRe}\\s*$`).test(t)
+  );
+};
+
+/**
+ * Strip markdown link syntax from a line, but only for links whose
+ * URL matches the item's URL. Converts:
+ *   [text](url)         → text
+ *   [url](url)          → ""  (self-link, redundant)
+ *   [<url>](<url>)      → ""
+ *   [text](<url>)       → text
+ * Also drops the line entirely if it reduces to a bare URL echo.
+ */
+const stripMarkdownLinks = (line: string, url: string): string => {
+  if (!url) return line;
+  const urlRe = escapeRegex(url);
+  const result = line.replace(
+    new RegExp(`\\[([^\\]]*)\\]\\(\\s*<?${urlRe}>?\\s*\\)`, "g"),
+    (_match, text) => {
+      const cleaned = text.trim().replace(/^<|>$/g, "");
+      return cleaned === url ? "" : cleaned;
+    }
+  );
+  if (new RegExp(`^\\s*<${urlRe}>\\s*$`).test(result)) return "";
+  if (new RegExp(`^\\s*${urlRe}\\s*$`).test(result)) return "";
+  return result.trim();
+};
+
+/**
+ * Derive a fallback title from the URL when jina's `### [](url)` header
+ * has an empty alt text (notably BBC News). Extracts the most specific
+ * path segment that isn't "articles", a hash-like id, or the generic
+ * "news" section, and formats it as "{source} — {Section}".
+ *
+ * Returns "" if no useful section is found — caller falls back to the
+ * source name.
+ */
+const deriveTitleFromUrl = (url: string, source: string): string => {
+  if (!url) return "";
+  try {
+    const u = new URL(url);
+    const segments = u.pathname.split("/").filter(Boolean);
+    const section = segments
+      .filter(
+        (s) =>
+          s.length > 2 &&
+          !/^articles?$/.test(s) &&
+          !/^[a-z0-9]{8,}$/.test(s) &&
+          !/^news$/.test(s)
+      )
+      .pop();
+    if (section) {
+      const readable = section
+        .replace(/-/g, " ")
+        .replace(/\b\w/g, (c) => c.toUpperCase());
+      return `${source} — ${readable}`;
+    }
+  } catch {
+    // ignore
+  }
+  return "";
+};
+
 /**
  * Map a raw RSS XML document to an array of `BearMdData` ready for the
  * Bear middle column + right pane.
@@ -184,24 +263,44 @@ export const mapRssJina = (mdText: string, source: string): BearMdData[] => {
   if (current) drafts.push(current);
 
   return drafts.map((d, index) => {
-    // jina echoes the link again on a line of its own right after
-    // the heading — strip that duplicate. Any non-empty first
-    // paragraph (or first heading) becomes the fallback title for
-    // feeds where jina renders `### [](url)` with an empty alt
-    // text (e.g. BBC News).
+    // Clean the body: drop URL echoes (jina's habit of repeating the
+    // article URL on its own line right after the header, sometimes
+    // wrapped in a `### [text](url)` link, sometimes in a bare
+    // `[url](url)` self-link) and strip remaining markdown links that
+    // point back at the item's URL. See the function-level docstring
+    // for why this is needed.
     const cleanBody = d.bodyLines
-      .filter((l) => l.trim() !== d.link && l.trim() !== `<${d.link}>`)
-      .join("\n")
+      .map((l) => l.trim())
+      .filter((l) => l.length > 0 && !isUrlEcho(l, d.link))
+      .map((l) => stripMarkdownLinks(l, d.link))
+      .filter((l) => l.length > 0)
+      .join("\n\n")
       .replace(/\n{3,}/g, "\n\n")
       .trim();
 
-    const fallbackTitle = cleanBody
+    // Title fallback chain:
+    //   1. jina-provided title
+    //   2. first non-URL paragraph from the cleaned body
+    //   3. URL-derived section hint (e.g. "BBC News — Football")
+    //   4. the source name itself (e.g. "BBC News")
+    const firstPara = cleanBody
       .split(/\n\n+/)
       .map((p) => p.trim())
-      .find((p) => p && p !== d.link && !p.startsWith("[") && !p.startsWith("!"));
-    const title = d.title || fallbackTitle || `Untitled Post ${index + 1}`;
+      .find((p) => p && !p.startsWith("[") && !p.startsWith("!"));
+    const title = d.title || firstPara || deriveTitleFromUrl(d.link, source) || source;
 
-    const summary = stripHtml(cleanBody || title);
+    // Excerpt: prefer body text, fall back to title (handles feeds
+    // like Hacker News where the body is just a URL echo and would
+    // otherwise leak the raw URL into the middle column).
+    //
+    // If the title fell back to just the source name (e.g. "BBC News"
+    // for items where jina gave us an empty alt text), append the
+    // pubDate so the excerpt carries at least some distinguishing
+    // information.
+    const isGenericTitle = title === source;
+    const summarySource =
+      cleanBody || (isGenericTitle && d.pubDate ? `${title} · ${d.pubDate}` : title);
+    const summary = stripHtml(summarySource);
     const excerpt = summary.slice(0, 140) + (summary.length > 140 ? "..." : "");
 
     let id = toFeedId(source, d.link || title, index);
@@ -221,7 +320,7 @@ export const mapRssJina = (mdText: string, source: string): BearMdData[] => {
       title,
       file: d.link,
       icon: "i-material-symbols:rss-feed-rounded",
-      excerpt: excerpt || "No excerpt available.",
+      excerpt: excerpt || `Article from ${source}`,
       link: d.link || undefined,
       content,
       source,
