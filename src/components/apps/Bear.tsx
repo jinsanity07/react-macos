@@ -395,12 +395,14 @@ const Bear = () => {
     }));
   };
 
-  // Keyboard navigation for the middle column. Only active when the
-  // RSS feed sidebar entry is selected — other Bear sections (Profile,
-  // Projects, Blogs) keep their click-only behavior.
-  const isRssActive = sidebarItems[state.curSidebar]?.id === "rss-feed";
+  // Keyboard navigation for the middle column. Active when the selected
+  // sidebar entry is one of the list-based sections (Blogs, RSS feed).
+  // Profile and Projects keep their click-only behavior — they're not
+  // list views, so ↑/↓ wouldn't make sense there.
+  const activeSidebarId = sidebarItems[state.curSidebar]?.id;
+  const isListActive = activeSidebarId === "rss-feed" || activeSidebarId === "blogs";
   const handleMidbarKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (!isRssActive) return;
+    if (!isListActive) return;
     if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
     e.preventDefault();
     const list = state.midbarList;
