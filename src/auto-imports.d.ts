@@ -22,6 +22,7 @@ declare global {
   const GUEST_UTILITY_FALLBACK: typeof import('./hooks/useOmkpieUtilities')['GUEST_UTILITY_FALLBACK']
   const IframeFrame: typeof import('./components/apps/IframeFrame')['default']
   const Launchpad: typeof import('./components/Launchpad')['default']
+  const MagnetMenu: typeof import('./components/menus/MagnetMenu')['default']
   const MenuItem: typeof import('./components/menus/base')['MenuItem']
   const MenuItemGroup: typeof import('./components/menus/base')['MenuItemGroup']
   const Ownpie: typeof import('./components/apps/Ownpie')['default']

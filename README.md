@@ -46,6 +46,14 @@ Build for production with minification to the `dist` folder:
 pnpm build
 ```
 
+## Magnet workspace layouts
+
+Use the horseshoe-magnet icon in the menu bar to apply a configured desktop workspace. The initial `time->work+out` layout opens Own Pie, Deltek Pro, and Jog-log in equal left-to-right columns while keeping the menu bar, Dock, and unrelated windows available.
+
+Layouts are defined in [`src/configs/layouts.ts`](src/configs/layouts.ts). Add another object with a stable `id`, menu `label`, and ordered `slots` containing desktop app IDs. Each referenced app must be registered in [`src/configs/apps.tsx`](src/configs/apps.tsx) with `desktop: true`; set `dock: false` when the app should be launchable by layouts and Spotlight without appearing in the Dock.
+
+Applying a layout opens or restores its apps, resets maximize/minimize state, raises them above existing windows, and recalculates the equal columns when the viewport or Dock size changes. The iframe destinations must allow framing and may still require their own authentication; blocked destinations should remain external links instead of being proxied or having frame protections bypassed.
+
 &nbsp;
 
 
