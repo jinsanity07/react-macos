@@ -12,7 +12,7 @@ export default function SanityMenu({ toggleSanityMenu, btnRef }: SanityMenuProps
 
   return (
     <div
-      className="w-80 h-160 max-w-full shadow-menu p-2.5 text-c-black bg-c-100/70 flex flex-col"
+      className="w-96 h-166 max-w-full shadow-menu p-2.5 text-c-black bg-c-100/70 flex flex-col"
       pos="fixed top-9.5 right-0 sm:right-1.5"
       border="~ menu rounded-2xl"
       ref={sanityRef}

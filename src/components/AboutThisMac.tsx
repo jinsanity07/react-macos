@@ -100,7 +100,7 @@ export default function AboutThisMac({ onClose }: AboutThisMacProps) {
               type="button"
               onClick={() =>
                 window.open(
-                  "https://jinsanity07git.github.io/blog/",
+                  "https://github.com/jinsanity07/react-macos/pulls",
                   "_blank",
                   "noopener,noreferrer"
                 )
