@@ -1,10 +1,11 @@
 import React from "react";
 import { format } from "date-fns";
 import { isFullScreen } from "~/utils";
-import { music } from "~/configs";
+import { music, workspaceLayouts } from "~/configs";
 import type { MacActions } from "~/types";
 import UsageBoardMenu from "./UsageBoardMenu";
 import SanityMenu from "./SanityMenu";
+import MagnetMenu from "./MagnetMenu";
 
 interface TopBarItemProps {
   hideOnMobile?: boolean;
@@ -65,6 +66,28 @@ const UsageBoardIcon = ({ size }: { size: number }) => {
   );
 };
 
+const MagnetIcon = ({ size }: { size: number }) => {
+  return (
+    <svg
+      viewBox="0 0 18 18"
+      width={size}
+      height={size}
+      xmlns="http://www.w3.org/2000/svg"
+      fill="currentColor"
+      aria-hidden="true"
+    >
+      <path d="M3.5 2h3v3h-3zM11.5 2h3v3h-3z" />
+      <path
+        d="M5 4v5a4 4 0 0 0 8 0V4"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="3"
+        strokeLinecap="square"
+      />
+    </svg>
+  );
+};
+
 interface TopBarProps extends MacActions {
   title: string;
   activeUtility?: {
@@ -81,11 +104,13 @@ interface TopBarProps extends MacActions {
   hide: boolean;
   toggleSpotlight: () => void;
   toggleAboutThisMac: () => void;
+  applyWorkspaceLayout: (layoutId: string) => void;
 }
 
 interface TopBarState {
   date: Date;
   showControlCenter: boolean;
+  showMagnetMenu: boolean;
   showUsageBoard: boolean;
   showSanityMenu: boolean;
   showWifiMenu: boolean;
@@ -97,6 +122,7 @@ const TopBar = (props: TopBarProps) => {
   const appleBtnRef = useRef<HTMLDivElement>(null);
   const usageBoardBtnRef = useRef<HTMLDivElement>(null);
   const controlCenterBtnRef = useRef<HTMLDivElement>(null);
+  const magnetMenuBtnRef = useRef<HTMLDivElement>(null);
   const wifiBtnRef = useRef<HTMLDivElement>(null);
   const spotlightBtnRef = useRef<HTMLDivElement>(null);
   const sanityBtnRef = useRef<HTMLDivElement>(null);
@@ -105,6 +131,7 @@ const TopBar = (props: TopBarProps) => {
   const [state, setState] = useState<TopBarState>({
     date: new Date(),
     showControlCenter: false,
+    showMagnetMenu: false,
     showUsageBoard: false,
     showSanityMenu: false,
     showWifiMenu: false,
@@ -167,6 +194,13 @@ const TopBar = (props: TopBarProps) => {
       ...state,
       showControlCenter: !state.showControlCenter
     });
+  };
+
+  const toggleMagnetMenu = (): void => {
+    setState((prev) => ({
+      ...prev,
+      showMagnetMenu: !prev.showMagnetMenu
+    }));
   };
 
   const toggleUsageBoard = (): void => {
@@ -305,6 +339,15 @@ const TopBar = (props: TopBarProps) => {
       )}
 
       <div className="hstack flex-row justify-end space-x-2">
+        <TopBarItem
+          forceHover={state.showMagnetMenu}
+          onClick={toggleMagnetMenu}
+          ref={magnetMenuBtnRef}
+        >
+          <span title="Magnet workspace layouts">
+            <MagnetIcon size={17} />
+          </span>
+        </TopBarItem>
         <TopBarItem hideOnMobile={true}>
           <Battery />
         </TopBarItem>
@@ -337,6 +380,15 @@ const TopBar = (props: TopBarProps) => {
         >
           <CCMIcon size={16} />
         </TopBarItem>
+
+        {state.showMagnetMenu && (
+          <MagnetMenu
+            layouts={workspaceLayouts}
+            applyLayout={props.applyWorkspaceLayout}
+            toggleMagnetMenu={toggleMagnetMenu}
+            btnRef={magnetMenuBtnRef}
+          />
+        )}
 
         {/* Open this when clicking on Wifi button */}
         {state.showWifiMenu && (

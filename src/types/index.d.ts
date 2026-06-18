@@ -16,6 +16,8 @@ export {
   BearMdData,
   BearData,
   LaunchpadData,
+  WorkspaceLayoutData,
+  WorkspaceLayoutSlot,
   MusicData,
   TerminalData,
   UserData,
