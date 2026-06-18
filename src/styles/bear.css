@@ -142,3 +142,78 @@
 .bear .markdown blockquote {
   @apply border-l-4 border-red-500 dark:border-red-400 pl-4 italic text-c-600 dark:text-c-400 my-4;
 }
+
+
+.bear .markdown.markdown-rss {
+  @apply text-sm leading-relaxed;
+}
+
+.bear .markdown.markdown-rss h1,
+.bear .markdown.markdown-rss h2,
+.bear .markdown.markdown-rss h3,
+.bear .markdown.markdown-rss h4 {
+  @apply mt-5;
+}
+
+.bear .markdown.markdown-rss h1::before,
+.bear .markdown.markdown-rss h2::before,
+.bear .markdown.markdown-rss h3::before,
+.bear .markdown.markdown-rss h4::before {
+  display: none;
+}
+
+.bear .markdown.markdown-rss h1 {
+  @apply text-2xl leading-tight;
+}
+
+.bear .markdown.markdown-rss h2 {
+  @apply text-lg leading-snug;
+}
+
+.bear .markdown.markdown-rss h3 {
+  @apply text-base leading-snug;
+}
+
+.bear .markdown.markdown-rss h4 {
+  @apply text-sm leading-snug;
+}
+
+.bear .markdown.markdown-rss p {
+  @apply mt-3 leading-6;
+}
+
+.bear .markdown.markdown-rss > p:first-of-type {
+  @apply mt-2 text-xs leading-5 text-c-500;
+}
+
+.bear .markdown.markdown-rss > p:first-of-type strong {
+  @apply font-semibold text-c-600;
+}
+
+.bear .markdown.markdown-rss h1 + p,
+.bear .markdown.markdown-rss h2 + p,
+.bear .markdown.markdown-rss h3 + p,
+.bear .markdown.markdown-rss h4 + p {
+  @apply mt-2;
+}
+
+.bear .markdown.markdown-rss h2:last-of-type {
+  @apply mt-6 border-t border-c-300 pt-4 text-base;
+}
+
+.bear .markdown.markdown-rss h2:last-of-type + p {
+  @apply mt-2 rounded border border-c-300 bg-white p-3 dark:bg-gray-900;
+}
+
+.bear .markdown.markdown-rss h2:last-of-type + p a {
+  @apply break-all font-semibold;
+}
+
+.bear .markdown.markdown-rss ul,
+.bear .markdown.markdown-rss ol {
+  @apply mt-3;
+}
+
+.bear .markdown.markdown-rss blockquote {
+  @apply my-3;
+}

@@ -13,12 +13,14 @@ interface ContentProps {
   contentID: string;
   contentURL: string;
   contentMd?: string;
+  sectionId?: string;
 }
 
 interface MiddlebarProps {
   items: BearMdData[];
   cur: number;
   setContent: (item: BearMdData, index: number) => void;
+  sectionId?: string;
 }
 
 interface SidebarProps {
@@ -56,7 +58,16 @@ const Sidebar = ({ items, cur, setMidBar }: SidebarProps) => {
   return (
     <div text-white>
       <div className="h-12 pr-3 hstack space-x-3 justify-end">
-        <span className="i-ic:baseline-cloud-off text-xl" />
+        <a
+          href="https://app.notion.com/"
+          target="_blank"
+          rel="noreferrer"
+          aria-label="Open Notion"
+          title="Open Notion"
+          className="hstack text-white/90 hover:text-white"
+        >
+          <span className="i-ic:baseline-cloud-off text-xl" />
+        </a>
         <span className="i-akar-icons:settings-vertical text-xl" />
       </div>
       <ul>
@@ -77,63 +88,130 @@ const Sidebar = ({ items, cur, setMidBar }: SidebarProps) => {
   );
 };
 
-const Middlebar = ({ items, cur, setContent }: MiddlebarProps) => {
+const formatRssDate = (value?: string): string => {
+  if (!value) return "";
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric"
+  }).format(date);
+};
+
+const Middlebar = ({ items, cur, setContent, sectionId }: MiddlebarProps) => {
   const dark = useStore((state) => state.dark);
+  const isRssFeed = sectionId === "rss-feed";
 
   return (
     <ul>
       {items.map((item: BearMdData, index: number) => {
         const sourceClass = item.source ? sourceColorClass(item.source) : "";
+        const formattedDate = isRssFeed ? formatRssDate(item.pubDate) : "";
         return (
           <li
             key={`bear-midbar-${item.id}`}
             data-midbar-item
             data-midbar-index={index}
-            className={`min-h-[48px] flex cursor-default border-l-4 px-3 py-2 ${
+            className={`flex cursor-default border-l-4 ${
+              isRssFeed ? "min-h-[44px] px-2.5 py-1.5" : "min-h-[48px] px-3 py-2"
+            } ${
               cur === index
                 ? "border-red-500 bg-white dark:bg-gray-900"
                 : `${sourceClass || "border-transparent"} bg-transparent`
             } hover:(bg-white dark:bg-gray-900)`}
             onClick={() => setContent(item, index)}
           >
-            <div className="flex flex-col justify-center min-w-0 flex-1">
-              <div className="flex items-baseline gap-2 min-w-0">
-                {item.source && (
-                  <span
-                    className="text-[10px] font-semibold tracking-wider uppercase text-c-500 flex-shrink-0"
-                    title={item.source}
-                  >
-                    {item.source}
-                  </span>
-                )}
+            {isRssFeed ? (
+              <div className="flex flex-col justify-center min-w-0 flex-1 gap-0.5">
                 <div
-                  className={`truncate font-medium text-sm ${
+                  className={`truncate text-[13px] leading-snug font-semibold ${
                     dark ? "text-gray-100" : "text-gray-900"
                   }`}
                   title={item.title}
                 >
                   {item.title}
                 </div>
+                {(item.source || formattedDate) && (
+                  <div className="flex items-center gap-1.5 min-w-0 text-[10px] leading-tight text-c-500">
+                    {item.source && (
+                      <span
+                        className="truncate font-semibold tracking-wider uppercase"
+                        title={item.source}
+                      >
+                        {item.source}
+                      </span>
+                    )}
+                    {item.source && formattedDate && (
+                      <span className="text-c-400" aria-hidden="true">
+                        /
+                      </span>
+                    )}
+                    {formattedDate && (
+                      <span className="truncate flex-shrink-0" title={item.pubDate}>
+                        {formattedDate}
+                      </span>
+                    )}
+                  </div>
+                )}
+                <div
+                  className="text-[11px] leading-snug text-c-500"
+                  style={{
+                    display: "-webkit-box",
+                    WebkitLineClamp: 1,
+                    WebkitBoxOrient: "vertical",
+                    overflow: "hidden"
+                  }}
+                >
+                  {item.excerpt}
+                </div>
               </div>
-              <div
-                className="text-xs text-c-500 mt-1"
-                style={{
-                  display: "-webkit-box",
-                  WebkitLineClamp: 2,
-                  WebkitBoxOrient: "vertical",
-                  overflow: "hidden"
-                }}
-              >
-                {item.excerpt}
+            ) : (
+              <div className="flex flex-col justify-center min-w-0 flex-1">
+                <div className="flex items-baseline gap-2 min-w-0">
+                  {item.source && (
+                    <span
+                      className="text-[10px] font-semibold tracking-wider uppercase text-c-500 flex-shrink-0"
+                      title={item.source}
+                    >
+                      {item.source}
+                    </span>
+                  )}
+                  <div
+                    className={`truncate font-medium text-sm ${
+                      dark ? "text-gray-100" : "text-gray-900"
+                    }`}
+                    title={item.title}
+                  >
+                    {item.title}
+                  </div>
+                </div>
+                <div
+                  className="text-xs text-c-500 mt-1"
+                  style={{
+                    display: "-webkit-box",
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: "vertical",
+                    overflow: "hidden"
+                  }}
+                >
+                  {item.excerpt}
+                </div>
               </div>
-            </div>
+            )}
             {item.link && (
               <a
                 href={item.link}
                 target="_blank"
                 rel="noreferrer"
-                className="ml-2 self-start mt-1 flex-shrink-0"
+                className={`ml-2 self-start flex-shrink-0 ${
+                  isRssFeed ? "mt-0.5" : "mt-1"
+                }`}
                 onClick={(e) => e.stopPropagation()}
+                aria-label={`Open ${item.title}`}
+                title="Open article"
               >
                 <span className="i-ant-design:link-outlined text-c-500" />
               </a>
@@ -187,7 +265,7 @@ const fixImageURL = (text: string, contentURL: string): string => {
   return text;
 };
 
-const Content = ({ contentID, contentURL, contentMd }: ContentProps) => {
+const Content = ({ contentID, contentURL, contentMd, sectionId }: ContentProps) => {
   const [storeMd, setStoreMd] = useState<Record<string, string>>({});
   // Track cached ids outside React state so the effect's dep array can
   // stay small and the cache check is decoupled from re-renders.
@@ -221,8 +299,14 @@ const Content = ({ contentID, contentURL, contentMd }: ContentProps) => {
     return () => ac.abort();
   }, [contentID, contentURL, contentMd]);
 
+  const isRssFeed = sectionId === "rss-feed";
+
   return (
-    <div className="markdown w-2/3 mx-auto px-2 py-6 text-c-700">
+    <div
+      className={`markdown mx-auto text-c-700 ${
+        isRssFeed ? "markdown-rss w-11/12 max-w-5xl px-4 py-4" : "w-2/3 px-2 py-6"
+      }`}
+    >
       <ReactMarkdown
         remarkPlugins={[remarkGfm, remarkMath]}
         rehypePlugins={[
@@ -326,11 +410,15 @@ const Bear = () => {
   }, [blogItems, feedItems]);
 
   const [state, setState] = useState<BearState>(() => {
-    const firstItem = sidebarItems[0].md[0];
+    const defaultSidebarIndex = sidebarItems.findIndex((item) => item.id === "rss-feed");
+    const initialSidebarIndex = defaultSidebarIndex >= 0 ? defaultSidebarIndex : 0;
+    const initialSidebar = sidebarItems[initialSidebarIndex];
+    const firstItem = initialSidebar.md[0];
+
     return {
-      curSidebar: 0,
+      curSidebar: initialSidebarIndex,
       curMidbar: 0,
-      midbarList: sidebarItems[0].md,
+      midbarList: initialSidebar.md,
       contentID: firstItem.id,
       contentURL: firstItem.file,
       contentMd: firstItem.content
@@ -439,6 +527,7 @@ const Bear = () => {
           items={state.midbarList}
           cur={state.curMidbar}
           setContent={setContent}
+          sectionId={activeSidebarId}
         />
       </div>
       <div className="flex-1 overflow-auto" bg="gray-50 dark:gray-800">
@@ -446,6 +535,7 @@ const Bear = () => {
           contentID={state.contentID}
           contentURL={state.contentURL}
           contentMd={state.contentMd}
+          sectionId={activeSidebarId}
         />
       </div>
     </div>
