@@ -25,6 +25,41 @@
 - If the feature embeds a remote page, prefer a direct iframe with no extra browser chrome unless the user explicitly asks for navigation controls.
 - Keep plugin panels visually consistent with the existing Control Center sizing, border, shadow, and spacing so they feel native to the app shell.
 
+## Feature Delivery Workflow
+
+Use this workflow for substantial features, bug fixes, refactors, and other release-impacting code changes unless the user explicitly requests a different Git strategy:
+
+**Pipeline:** feature prompt → implementation contract → latest-base feature branch → milestone implementation and commits → version/changelog/docs → validation → push → draft PR with a descriptive title and detailed body → handoff.
+
+1. **Translate the feature prompt into an implementation contract.**
+   - Restate the intended behavior, assumptions, scope boundaries, acceptance criteria, and validation plan.
+   - Inspect the relevant code and repository state before editing; preserve unrelated work.
+2. **Create a feature branch from the latest target branch.**
+   - Identify the requested PR base; otherwise use the repository's active development/deploy branch.
+   - Fetch the remote base and branch from its latest commit using a descriptive name such as `codex/<feature-name>`.
+   - Do not implement substantial feature work directly on the base branch.
+3. **Implement in reviewable milestones.**
+   - Keep changes small and aligned with existing architecture.
+   - Define milestone boundaries before or during implementation, such as core model/engine, UI integration, and documentation/validation.
+   - Commit each completed, coherent milestone separately with a concise imperative message. Stage only files belonging to that milestone.
+4. **Update release metadata and documentation.**
+   - For release-impacting code changes, bump the appropriate semantic version in `package.json`; default to a patch bump unless the scope requires minor or major.
+   - Add a user-facing changelog entry when a changelog exists. If the repository uses README release notes instead, update that section.
+   - Update README setup, usage, configuration, limitations, or extension guidance whenever behavior changes.
+5. **Validate before publishing.**
+   - Run `pnpm lint` and `pnpm build`, plus focused automated or manual interaction checks appropriate to the feature.
+   - Fix validation failures caused by the change and document unrelated pre-existing warnings or environment limitations.
+   - Confirm the final worktree and diff contain only intended files.
+6. **Push the feature branch and create a draft pull request.**
+   - Push with upstream tracking; never force-push unless the user explicitly authorizes it.
+   - Use a descriptive PR title, normally `[codex] <feature summary>`.
+   - Write a detailed Markdown body covering: summary and motivation, implementation/configuration model, user and developer impact, important behavior and tradeoffs, validation results, known limitations, and any follow-up work.
+   - Target the selected base branch and verify the PR is open as a draft with the correct head/base refs.
+7. **Hand off the result.**
+   - Report the branch, milestone commits, version change, validation results, and PR URL.
+
+Skip the branch/version/PR workflow for pure conversation, inspection-only work, plans, and small documentation-only edits unless the user asks to publish them. Direct commits or pushes to the base branch require explicit user instruction.
+
 ## Hotkey Practice
 - Treat browser hotkeys as in-page shortcuts, not host-level overrides. A global OS shortcut or another app may still win.
 - Use capture-phase listeners on `window` when the active page should prioritize a shortcut, and call `preventDefault()` only for the exact chord you own.
