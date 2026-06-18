@@ -77,6 +77,17 @@ const apps: AppsData[] = [
     iframeVersion: "0.0.1"
   },
   {
+    id: "asana",
+    title: "Asana",
+    desktop: true,
+    dock: false,
+    width: 640,
+    height: 600,
+    img: "img/icons/launchpad/gungnir.png",
+    iframeSrc: "https://o.mkpie.me/app/gasana",
+    iframeVersion: "0.0.1"
+  },
+  {
     id: "deltekpro",
     title: "Deltek Pro",
     desktop: true,

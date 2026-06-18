@@ -25,6 +25,13 @@
 - If the feature embeds a remote page, prefer a direct iframe with no extra browser chrome unless the user explicitly asks for navigation controls.
 - Keep plugin panels visually consistent with the existing Control Center sizing, border, shadow, and spacing so they feel native to the app shell.
 
+## Approval and Autonomy
+
+- Read-only inspection commands are always authorized.
+- For requested implementation work, workspace edits, formatting, linting, builds, tests, temporary development servers, and cleanup of agent-created temporary files are authorized without additional confirmation.
+- When the request explicitly includes publishing, fetching, branch creation, commits, pushes, and draft PR creation are authorized.
+- Always request approval for destructive operations, force pushes, merges, hard resets, deleting user-owned files, writes outside the workspace, persistent system installations, secret access, or unrelated external communication.
+
 ## Feature Delivery Workflow
 
 Use this workflow for substantial features, bug fixes, refactors, and other release-impacting code changes unless the user explicitly requests a different Git strategy:

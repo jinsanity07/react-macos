@@ -66,28 +66,6 @@ const UsageBoardIcon = ({ size }: { size: number }) => {
   );
 };
 
-const MagnetIcon = ({ size }: { size: number }) => {
-  return (
-    <svg
-      viewBox="0 0 18 18"
-      width={size}
-      height={size}
-      xmlns="http://www.w3.org/2000/svg"
-      fill="currentColor"
-      aria-hidden="true"
-    >
-      <path d="M3.5 2h3v3h-3zM11.5 2h3v3h-3z" />
-      <path
-        d="M5 4v5a4 4 0 0 0 8 0V4"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="3"
-        strokeLinecap="square"
-      />
-    </svg>
-  );
-};
-
 interface TopBarProps extends MacActions {
   title: string;
   activeUtility?: {
@@ -345,7 +323,12 @@ const TopBar = (props: TopBarProps) => {
           ref={magnetMenuBtnRef}
         >
           <span title="Magnet workspace layouts">
-            <MagnetIcon size={17} />
+            <img
+              className="size-[17px]"
+              src="img/icons/magnet-menu.svg"
+              alt=""
+              aria-hidden="true"
+            />
           </span>
         </TopBarItem>
         <TopBarItem hideOnMobile={true}>
