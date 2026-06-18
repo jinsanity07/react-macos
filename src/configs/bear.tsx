@@ -81,7 +81,7 @@ const bear: BearData[] = [
   {
     id: "blogs",
     title: "Blogs",
-    icon: "i-material-symbols:rss-feed-rounded",
+    icon: "i-material-symbols:article-rounded",
     md: [
       {
         id: "blogs-loading",

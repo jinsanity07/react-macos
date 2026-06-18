@@ -66,7 +66,7 @@ const Sidebar = ({ items, cur, setMidBar }: SidebarProps) => {
           title="Open Notion"
           className="hstack text-white/90 hover:text-white"
         >
-          <span className="i-ic:baseline-cloud-off text-xl" />
+          <span className="i-ic:baseline-cloud text-xl" />
         </a>
         <span className="i-akar-icons:settings-vertical text-xl" />
       </div>
