@@ -66,6 +66,7 @@ export default function MagnetMenu({
         position: "fixed",
         left: position?.left ?? 0,
         top: position?.top ?? 0,
+        marginLeft: 0,
         maxWidth: `calc(100vw - ${viewportPadding * 2}px)`,
         visibility: position ? "visible" : "hidden"
       }}

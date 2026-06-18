@@ -48,11 +48,20 @@ pnpm build
 
 ## Magnet workspace layouts
 
-Use the horseshoe-magnet icon in the menu bar to apply a configured desktop workspace. The initial `time->work+out` layout opens Own Pie, Deltek Pro, and Jog-log in equal left-to-right columns while keeping the menu bar, Dock, and unrelated windows available.
+Use the blue three-bar Magnet icon in the menu bar to apply a configured desktop workspace. The panel opens 6px below the launcher, aligns its right edge with the launcher, and stays clamped inside the viewport.
+
+Two layouts are available:
+
+- `time->work+out`: Own Pie, Deltek Pro, and Jog-log.
+- `time->asana+deltek`: Own Pie, Asana, and Deltek Pro.
+
+Each layout opens its apps in equal left-to-right columns while keeping the menu bar, Dock, and unrelated windows available.
 
 Layouts are defined in [`src/configs/layouts.ts`](src/configs/layouts.ts). Add another object with a stable `id`, menu `label`, and ordered `slots` containing desktop app IDs. Each referenced app must be registered in [`src/configs/apps.tsx`](src/configs/apps.tsx) with `desktop: true`; set `dock: false` when the app should be launchable by layouts and Spotlight without appearing in the Dock.
 
-Applying a layout opens or restores its apps, resets maximize/minimize state, raises them above existing windows, and recalculates the equal columns when the viewport or Dock size changes. The iframe destinations must allow framing and may still require their own authentication; blocked destinations should remain external links instead of being proxied or having frame protections bypassed.
+Applying a layout opens or restores its apps, resets maximize/minimize state, raises them above existing windows, and recalculates the equal columns when the viewport or Dock size changes. Iframe content is unobstructed; focus an iframe app and use its app-name menu in the top bar for Open in New Tab, Refresh Page, and Version.
+
+The iframe destinations must allow framing and may still require their own authentication. If a destination blocks embedding, use Open in New Tab instead of proxying it or bypassing its frame protections.
 
 &nbsp;
 
@@ -86,6 +95,8 @@ The prefix **`i-mdi`** in `i-mdi:chart-bar-stacked` refers to an icon library in
 
 ## Changelog
 
+- **Update 2026.06.18**: Refine Magnet with its official menu icon, launcher-relative responsive positioning, unobstructed iframe content, and the `time->asana+deltek` workspace.
+
 - **Update 2023.06.26**: Improve [FaceTime](https://support.apple.com/en-us/HT208176).
 
 - **Update 2023.06.25**: Add [Typora](https://typora.io/), built on top of [Milkdown](https://milkdown.dev/).
@@ -102,6 +113,7 @@ The prefix **`i-mdi`** in `i-mdi:chart-bar-stacked` refers to an icon library in
 - macOS
   - [Monterey](https://www.apple.com/macos/monterey/)
   - [Catalina](https://www.apple.com/bw/macos/catalina/)
+- [Magnet menu icon](https://magnet.crowdcafe.com/imgs/menu.svg)
 - [macOS Icon Gallery](https://www.macosicongallery.com/)
 - [sindresorhus/file-icon-cli](https://github.com/sindresorhus/file-icon-cli)
 - [vivek9patel.github.io](https://github.com/vivek9patel/vivek9patel.github.io)
