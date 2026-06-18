@@ -582,6 +582,7 @@ export default function Desktop(props: MacActions) {
         restartMac={props.restartMac}
         toggleSpotlight={toggleSpotlight}
         toggleAboutThisMac={toggleAboutThisMac}
+        applyWorkspaceLayout={applyWorkspaceLayout}
         hide={state.hideDockAndTopbar}
         setSpotlightBtnRef={setSpotlightBtnRef}
       />
