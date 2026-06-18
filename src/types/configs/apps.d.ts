@@ -2,6 +2,8 @@ export interface AppsData {
   id: string;
   title: string;
   desktop: boolean;
+  /** Whether the app should appear in the Dock. Defaults to true. */
+  dock?: boolean;
   img: string;
   show?: boolean;
   width?: number;
@@ -14,7 +16,7 @@ export interface AppsData {
   content?: JSX.Element;
   link?: string;
   /**
-   * When set, the dock-hosted app renders a single iframe with this src
+   * When set, the desktop app renders a single iframe with this src
    * (instead of `content`) and is eligible for the per-app menu in the
    * top bar (Open in New Tab / Refresh / Version).
    */

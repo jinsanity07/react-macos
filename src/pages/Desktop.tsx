@@ -1,9 +1,10 @@
 import React from "react";
-import { apps, wallpapers } from "~/configs";
+import { apps, wallpapers, workspaceLayouts } from "~/configs";
 import { useOmkpieUtilities } from "~/hooks/useOmkpieUtilities";
 import { minMarginY } from "~/utils";
 import type { MacActions } from "~/types";
 import AboutThisMac from "~/components/AboutThisMac";
+import type { AppWindowGeometry } from "~/components/AppWindow";
 import type { SpotlightHandle } from "~/components/Spotlight";
 import IframeFrame, { type IframeFrameHandle } from "~/components/apps/IframeFrame";
 
@@ -38,6 +39,11 @@ interface DesktopState {
   iframeAppRefreshKeys: {
     [id: string]: number;
   };
+  windowGeometries: {
+    [id: string]: AppWindowGeometry | undefined;
+  };
+  activeLayoutId: string | null;
+  layoutRevision: number;
 }
 
 export default function Desktop(props: MacActions) {
@@ -54,7 +60,10 @@ export default function Desktop(props: MacActions) {
     spotlight: false,
     aboutThisMac: false,
     utilityWindow: null,
-    iframeAppRefreshKeys: {}
+    iframeAppRefreshKeys: {},
+    windowGeometries: {},
+    activeLayoutId: null,
+    layoutRevision: 0
   } as DesktopState);
 
   const [spotlightBtnRef, setSpotlightBtnRef] =
@@ -72,6 +81,8 @@ export default function Desktop(props: MacActions) {
     dark: state.dark,
     brightness: state.brightness
   }));
+  const dockSize = useStore((state) => state.dockSize);
+  const { winWidth, winHeight } = useWindowSize();
 
   const getAppsData = (): void => {
     let showApps = {},
@@ -98,7 +109,7 @@ export default function Desktop(props: MacActions) {
       };
     });
 
-    setState({ ...state, showApps, appsZ, maxApps, minApps });
+    setState((prev) => ({ ...prev, showApps, appsZ, maxApps, minApps }));
   };
 
   useEffect(() => {
@@ -328,6 +339,10 @@ export default function Desktop(props: MacActions) {
 
     // get the corrosponding dock icon's position
     let r = document.querySelector(`#dock-${id}`) as HTMLElement;
+    if (!r) {
+      setAppMin(id, true);
+      return;
+    }
     const dockAppRect = r.getBoundingClientRect();
 
     r = document.querySelector(`#window-${id}`) as HTMLElement;
@@ -391,6 +406,63 @@ export default function Desktop(props: MacActions) {
     }
   };
 
+  const applyWorkspaceLayout = (layoutId: string): void => {
+    const layout = workspaceLayouts.find((item) => item.id === layoutId);
+    if (!layout) return;
+
+    const layoutApps = layout.slots.flatMap((slot) => {
+      const app = apps.find((item) => item.id === slot.appId && item.desktop);
+      return app ? [app] : [];
+    });
+    if (layoutApps.length === 0) return;
+
+    setState((prev) => {
+      const revision = prev.layoutRevision + 1;
+      const workspaceHeight = Math.max(1, winHeight - minMarginY - (dockSize + 15 + 4));
+      const columnWidth = Math.max(1, winWidth) / layoutApps.length;
+      const showApps = { ...prev.showApps };
+      const appsZ = { ...prev.appsZ };
+      const maxApps = { ...prev.maxApps };
+      const minApps = { ...prev.minApps };
+      const windowGeometries = { ...prev.windowGeometries };
+      let nextZ = prev.maxZ;
+
+      layoutApps.forEach((app, index) => {
+        nextZ += 1;
+        showApps[app.id] = true;
+        appsZ[app.id] = nextZ;
+        maxApps[app.id] = false;
+        minApps[app.id] = false;
+        windowGeometries[app.id] = {
+          x: index * columnWidth,
+          y: 0,
+          width: columnWidth,
+          height: workspaceHeight,
+          revision
+        };
+      });
+
+      return {
+        ...prev,
+        showApps,
+        appsZ,
+        maxApps,
+        minApps,
+        windowGeometries,
+        maxZ: nextZ,
+        currentTitle: layoutApps[layoutApps.length - 1].title,
+        hideDockAndTopbar: false,
+        activeLayoutId: layout.id,
+        layoutRevision: revision
+      };
+    });
+  };
+
+  useEffect(() => {
+    if (!state.activeLayoutId) return;
+    applyWorkspaceLayout(state.activeLayoutId);
+  }, [winWidth, winHeight, dockSize]);
+
   const renderAppWindows = () => {
     const windows = apps.map((app) => {
       if (app.desktop && state.showApps[app.id]) {
@@ -407,6 +479,7 @@ export default function Desktop(props: MacActions) {
           z: state.appsZ[app.id],
           max: state.maxApps[app.id],
           min: state.minApps[app.id],
+          geometry: state.windowGeometries[app.id],
           close: closeApp,
           setMax: setAppMax,
           setMin: minimizeApp,

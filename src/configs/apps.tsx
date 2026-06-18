@@ -66,7 +66,7 @@ const apps: AppsData[] = [
   },
   {
     id: "ownpie",
-    title: "Ownpie",
+    title: "Own Pie",
     desktop: true,
     width: 350,
     height: 600,
@@ -74,6 +74,28 @@ const apps: AppsData[] = [
     y: -30,
     img: "img/icons/sunrise-calendar.avif",
     iframeSrc: "https://o.mkpie.me/app/ownpie/",
+    iframeVersion: "0.0.1"
+  },
+  {
+    id: "deltekpro",
+    title: "Deltek Pro",
+    desktop: true,
+    dock: false,
+    width: 640,
+    height: 600,
+    img: "https://messenger-assets.qualified.com/uploads/7umMCBSyWG9adXjQX5fwFzgbAtESPgTSZo2r5/b8dc7515ddfbeacc7c2b2e4c85a568359289ed3a7477f328c6fc50553306fb77.png",
+    iframeSrc: "https://o.mkpie.me/static/cloud/usertemp/101412127/Deltek_report.html",
+    iframeVersion: "0.0.1"
+  },
+  {
+    id: "joglog",
+    title: "Jog-log",
+    desktop: true,
+    dock: false,
+    width: 640,
+    height: 600,
+    img: "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource221/v4/66/95/d0/6695d0b8-a4dc-8e49-9c58-5266b699d2eb/Placeholder.mill/400x400bb-75.webp",
+    iframeSrc: "https://o.mkpie.me/static/cloud/clean-single-bundle.html",
     iframeVersion: "0.0.1"
   },
   {

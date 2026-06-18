@@ -55,6 +55,7 @@ interface WindowProps extends TrafficProps {
   z: number;
   focus: (id: string) => void;
   children: React.ReactNode;
+  geometry?: AppWindowGeometry;
 }
 
 interface WindowState {
@@ -62,6 +63,15 @@ interface WindowState {
   height: number;
   x: number;
   y: number;
+  externallyPositioned: boolean;
+}
+
+export interface AppWindowGeometry {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  revision: number;
 }
 
 const TrafficLights = ({ id, close, aspectRatio, max, setMax, setMin }: TrafficProps) => {
@@ -119,7 +129,8 @@ const Window = (props: WindowProps) => {
     // "+ winWidth" because of the boundary for windows
     x: winWidth + (winWidth - initWidth) / 2 + (props.x || 0),
     // "- minMarginY" because of the boundary for windows
-    y: (winHeight - initHeight - dockSize - minMarginY) / 2 + (props.y || 0)
+    y: (winHeight - initHeight - dockSize - minMarginY) / 2 + (props.y || 0),
+    externallyPositioned: false
   });
 
   useEffect(() => {
@@ -131,6 +142,20 @@ const Window = (props: WindowProps) => {
       height: Math.min(prev.height, winHeight)
     }));
   }, [winWidth, winHeight]);
+
+  useEffect(() => {
+    if (!props.geometry) return;
+
+    setState({
+      width: Math.max(1, Math.min(props.geometry.width, winWidth)),
+      height: Math.max(1, Math.min(props.geometry.height, winHeight)),
+      // The window boundary starts one viewport-width to the left.
+      x: winWidth + props.geometry.x,
+      // The window boundary itself starts immediately below the menu bar.
+      y: props.geometry.y,
+      externallyPositioned: true
+    });
+  }, [props.geometry, winWidth, winHeight]);
 
   const round = props.max ? "rounded-none" : "rounded-lg";
   const minimized = props.min
@@ -155,25 +180,34 @@ const Window = (props: WindowProps) => {
       position={{
         x: props.max
           ? winWidth // because of boundary
-          : Math.min(
-              // "winWidth * 2" because of the boundary for windows
-              winWidth * 2 - minMarginX,
-              Math.max(
-                // "+ winWidth" because we add a boundary for windows
-                winWidth - state.width + minMarginX,
-                state.x
-              )
-            ),
+          : state.externallyPositioned
+            ? state.x
+            : Math.min(
+                // "winWidth * 2" because of the boundary for windows
+                winWidth * 2 - minMarginX,
+                Math.max(
+                  // "+ winWidth" because we add a boundary for windows
+                  winWidth - state.width + minMarginX,
+                  state.x
+                )
+              ),
         y: props.max
           ? -minMarginY // because of boundary
-          : Math.min(
-              // "- minMarginY" because of the boundary for windows
-              winHeight - minMarginY - (dockSize + 15 + minMarginY),
-              Math.max(0, state.y)
-            )
+          : state.externallyPositioned
+            ? state.y
+            : Math.min(
+                // "- minMarginY" because of the boundary for windows
+                winHeight - minMarginY - (dockSize + 15 + minMarginY),
+                Math.max(0, state.y)
+              )
       }}
       onDragStop={(_e, d) => {
-        setState((prev) => ({ ...prev, x: d.x, y: d.y }));
+        setState((prev) => ({
+          ...prev,
+          x: d.x,
+          y: d.y,
+          externallyPositioned: false
+        }));
       }}
       onResizeStop={(_e, _direction, ref, _delta, position) => {
         setState((prev) => ({
@@ -181,11 +215,20 @@ const Window = (props: WindowProps) => {
           width: parseInt(ref.style.width, 10),
           height: parseInt(ref.style.height, 10),
           x: position.x,
-          y: position.y
+          y: position.y,
+          externallyPositioned: false
         }));
       }}
-      minWidth={props.minWidth ? props.minWidth : 200}
-      minHeight={props.minHeight ? props.minHeight : 150}
+      minWidth={
+        props.geometry
+          ? Math.min(props.minWidth ?? 200, Math.max(1, props.geometry.width))
+          : props.minWidth ?? 200
+      }
+      minHeight={
+        props.geometry
+          ? Math.min(props.minHeight ?? 150, Math.max(1, props.geometry.height))
+          : props.minHeight ?? 150
+      }
       dragHandleClassName="window-bar"
       disableDragging={props.max}
       enableResizing={!props.max}
