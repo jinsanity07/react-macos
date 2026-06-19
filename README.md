@@ -95,6 +95,8 @@ The prefix **`i-mdi`** in `i-mdi:chart-bar-stacked` refers to an icon library in
 
 ## Changelog
 
+- **Update 2026.06.19**: Fix the per-app menu's "Refresh Page" action — the iframe now reloads in place via `node.src = node.src`, which is the only cross-origin-safe reload primitive the parent can use. Previously the call crossed the same-origin policy, threw a silent `SecurityError`, and left the embedded app (Own Pie / Asana / Deltek Pro / Jog-log) frozen on the parent shell.
+
 - **Update 2026.06.18**: Refine Magnet with its official menu icon, launcher-relative responsive positioning, unobstructed iframe content, and the `time->asana+deltek` workspace.
 
 - **Update 2023.06.26**: Improve [FaceTime](https://support.apple.com/en-us/HT208176).
