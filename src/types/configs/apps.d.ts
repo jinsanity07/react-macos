@@ -21,6 +21,6 @@ export interface AppsData {
    * top bar (Open in New Tab / Refresh / Version).
    */
   iframeSrc?: string;
-  /** Display version when `iframeSrc` is set. Defaults to `v0.0.1`. */
+  /** Display version when `iframeSrc` is set. Defaults to `0.0.1`. */
   iframeVersion?: string;
 }

@@ -2,70 +2,172 @@ import { useEffect, useState } from "react";
 import { user } from "~/configs";
 import type { LaunchpadData } from "~/types";
 
+type UtilityStatus = {
+  key?: string;
+  name?: string;
+  endpoint?: string;
+  status?: string;
+  version?: string;
+  runtime?: string;
+  pid?: number | null;
+  port?: number | null;
+  active_by_default?: boolean;
+  auto_launch_on_open?: boolean;
+  last_error?: string | null;
+  restart_count?: number;
+  started_at?: number | null;
+  log_path?: string | null;
+};
+
 type UtilitiesStatusResponse = {
-  utilities?: Array<{
-    key?: string;
-    name?: string;
-    endpoint?: string;
-    status?: string;
-    version?: string;
-  }>;
+  server_version?: string;
+  utilities?: UtilityStatus[];
 };
 
 export const GUEST_UTILITY_FALLBACK: NonNullable<UtilitiesStatusResponse["utilities"]> = [
   {
     key: "gasana",
     name: "Asana",
+    version: "0.0.2",
     endpoint: "/app/gasana",
-    status: "stopped"
+    status: "stopped",
+    runtime: "subprocess",
+    pid: null,
+    port: null,
+    active_by_default: false,
+    auto_launch_on_open: true,
+    last_error: null,
+    restart_count: 0,
+    started_at: null,
+    log_path: null
   },
   {
     key: "caizheng",
     name: "Cai Zheng Paystub",
+    version: "0.0.1",
     endpoint: "/app/caizheng",
-    status: "stopped"
+    status: "stopped",
+    runtime: "subprocess",
+    pid: null,
+    port: null,
+    active_by_default: false,
+    auto_launch_on_open: true,
+    last_error: null,
+    restart_count: 0,
+    started_at: null,
+    log_path: null
   },
   {
     key: "jiji",
     name: "Jiji",
+    version: "0.0.1",
     endpoint: "/app/jiji",
-    status: "stopped"
+    status: "stopped",
+    runtime: "subprocess",
+    pid: null,
+    port: null,
+    active_by_default: false,
+    auto_launch_on_open: true,
+    last_error: null,
+    restart_count: 0,
+    started_at: null,
+    log_path: null
   },
   {
     key: "joglog",
     name: "Jog🏃🏻Log",
+    version: "0.0.2",
     endpoint: "/app/joglog",
-    status: "running"
+    status: "running",
+    runtime: "in_process",
+    pid: null,
+    port: null,
+    active_by_default: true,
+    auto_launch_on_open: true,
+    last_error: null,
+    restart_count: 0,
+    started_at: null,
+    log_path: null
   },
   {
     key: "drive_search",
     name: "Local Drive Search",
+    version: "0.0.2",
     endpoint: "/app/drive-search",
-    status: "stopped"
+    status: "stopped",
+    runtime: "subprocess",
+    pid: null,
+    port: null,
+    active_by_default: false,
+    auto_launch_on_open: true,
+    last_error: null,
+    restart_count: 0,
+    started_at: null,
+    log_path: null
   },
   {
     key: "ownpie",
     name: "Own Pie",
+    version: "0.0.1",
     endpoint: "/app/ownpie",
-    status: "running"
+    status: "running",
+    runtime: "in_process",
+    pid: null,
+    port: null,
+    active_by_default: true,
+    auto_launch_on_open: true,
+    last_error: null,
+    restart_count: 0,
+    started_at: null,
+    log_path: null
   },
   {
     key: "sigbot",
     name: "Sigbot",
+    version: "0.0.1",
     endpoint: "/sigbot/gradio",
-    status: "stopped"
+    status: "stopped",
+    runtime: "subprocess",
+    pid: null,
+    port: null,
+    active_by_default: false,
+    auto_launch_on_open: true,
+    last_error: null,
+    restart_count: 0,
+    started_at: null,
+    log_path: null
   },
   {
     key: "usageboard",
     name: "UsageBoard",
+    version: "0.0.2",
     endpoint: "/app/usageboard",
-    status: "running"
+    status: "running",
+    runtime: "subprocess",
+    pid: null,
+    port: null,
+    active_by_default: false,
+    auto_launch_on_open: true,
+    last_error: null,
+    restart_count: 0,
+    started_at: null,
+    log_path: null
   },
   {
     key: "workspace_connectivity",
     name: "Workspace Connectivity",
+    version: "0.1.0",
     endpoint: "/app/workspace-connectivity",
-    status: "stopped"
+    status: "stopped",
+    runtime: "subprocess",
+    pid: null,
+    port: null,
+    active_by_default: false,
+    auto_launch_on_open: true,
+    last_error: null,
+    restart_count: 0,
+    started_at: null,
+    log_path: null
   }
 ];
 

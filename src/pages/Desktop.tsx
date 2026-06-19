@@ -193,7 +193,7 @@ export default function Desktop(props: MacActions) {
         utilityWindow: {
           title,
           src,
-          version: version ?? "v0.0.1",
+          version: version ?? "0.0.1",
           refreshKey: 0,
           z: nextZ,
           max: false,
@@ -567,7 +567,7 @@ export default function Desktop(props: MacActions) {
                   id: app.id,
                   title: app.title,
                   src: app.iframeSrc,
-                  version: `v${app.iframeVersion ?? "0.0.1"}`
+                  version: app.iframeVersion ?? "0.0.1"
                 };
               })()
         }

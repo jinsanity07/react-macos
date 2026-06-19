@@ -251,6 +251,11 @@ const Spotlight = forwardRef<SpotlightHandle, SpotlightProps>(function Spotlight
       .replace("bg-transparent", textSelected);
   };
 
+  const realVersion =
+    curDetails && curDetails.type === "portfolio" && "version" in curDetails
+      ? curDetails.version
+      : undefined;
+
   const handleKeyPress = (e: React.KeyboardEvent<HTMLDivElement>) => {
     const keyCode = e.key;
     const numApps = appIdList.length;
@@ -327,7 +332,9 @@ const Spotlight = forwardRef<SpotlightHandle, SpotlightProps>(function Spotlight
                   {curDetails.title}
                 </div>
                 <div text="xs c-500">
-                  {`Version: ${getRandom(0, 99)}.${getRandom(0, 999)}`}
+                  {realVersion
+                    ? `Version ${realVersion}`
+                    : `Version: ${getRandom(0, 99)}.${getRandom(0, 999)}`}
                 </div>
               </div>
               <div className="flex-1 hstack text-xs">
