@@ -154,7 +154,7 @@ const apps: AppsData[] = [
     title: "Claude",
     desktop: false,
     img: "img/icons/claude.png",
-    link: "https://claude.ai/"
+    link: "https://claude.ai/customize/connectors"
   }
 ];
 
