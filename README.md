@@ -95,6 +95,8 @@ The prefix **`i-mdi`** in `i-mdi:chart-bar-stacked` refers to an icon library in
 
 ## Changelog
 
+- **Update 2026.06.19**: Surface the per-utility `version` returned by `/api/utilities/status`. The endpoint now wraps utilities in a `server_version` envelope and each row carries `version`, `runtime`, `pid`, `port`, `active_by_default`, and friends; the consumer (`useOmkpieUtilities`) widens to match, the `GUEST_UTILITY_FALLBACK` mirrors the new payload, and the dock `iframeVersion` for Asana / Jog-log bumps to the reported values. The per-app top-bar menu and Spotlight's right details pane now show the real `X.Y.Z` version (no more `v` prefix or random placeholder).
+
 - **Update 2026.06.19**: Fix the per-app menu's "Refresh Page" action — the iframe now reloads in place via `node.src = node.src`, which is the only cross-origin-safe reload primitive the parent can use. Previously the call crossed the same-origin policy, threw a silent `SecurityError`, and left the embedded app (Own Pie / Asana / Deltek Pro / Jog-log) frozen on the parent shell.
 
 - **Update 2026.06.18**: Refine Magnet with its official menu icon, launcher-relative responsive positioning, unobstructed iframe content, and the `time->asana+deltek` workspace.
