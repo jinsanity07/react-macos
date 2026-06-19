@@ -31,15 +31,25 @@ const IframeFrame = React.forwardRef<IframeFrameHandle, IframeFrameProps>(
       ref,
       () => ({
         reload: (): void => {
-          // Same-origin / cross-origin safe: setting `location.reload` is
-          // callable in both cases. If the parent page is cross-origin
-          // and the browser blocks the call, the catch is a no-op for
-          // the user (and the iframe is unreachable from the parent
-          // anyway, which is the desired isolation).
+          // Reassign the iframe's `src` attribute to its current value.
+          // This is the only cross-origin-safe way to reload a child
+          // frame from the parent: calling
+          // `iframe.contentWindow.location.reload()` is blocked by the
+          // same-origin policy when the embedded page is hosted on a
+          // different origin (e.g. the magnet-laid-out apps - Own Pie /
+          // Asana / Deltek Pro / Jog-log all live on o.mkpie.me while
+          // this shell is served from jinsanity07.github.io), and would
+          // throw a `SecurityError` that the previous catch silently
+          // swallowed, leaving the user with a frozen page. Reading
+          // `src` from the live DOM node (not the React prop) ensures we
+          // refresh the *currently rendered* document, which can drift
+          // from the prop across remounts.
           try {
-            iframeRef.current?.contentWindow?.location.reload();
+            const node = iframeRef.current;
+            if (node) node.src = node.src;
           } catch {
-            // Cross-origin iframe — nothing the parent can do.
+            // Setting `src` is attribute-level and cannot throw under
+            // the same-origin policy; this catch is defensive only.
           }
         }
       }),
