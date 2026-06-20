@@ -95,6 +95,8 @@ The prefix **`i-mdi`** in `i-mdi:chart-bar-stacked` refers to an icon library in
 
 ## Changelog
 
+- **Update 2026.06.20**: Resolve the dock `iframeVersion` from the live `/api/utilities/status` payload. The hook now exposes the raw utility rows and a `useOmkpieUtilityVersion(src)` lookup that matches the iframe src's pathname to a utility `endpoint` and returns its reported `version`. `Desktop.tsx` prefers the live version for the focused dock iframe app and falls back to the static `iframeVersion` / `0.0.1` only when the API is unreachable or the src isn't an omkpie endpoint. The hand-maintained `0.0.2` bumps in `apps.tsx` are reverted; `apps.d.ts` documents the runtime resolver.
+
 - **Update 2026.06.19**: Fix the per-app menu's "Refresh Page" action — the iframe now reloads in place via `node.src = node.src`, which is the only cross-origin-safe reload primitive the parent can use. Previously the call crossed the same-origin policy, threw a silent `SecurityError`, and left the embedded app (Own Pie / Asana / Deltek Pro / Jog-log) frozen on the parent shell.
 
 - **Update 2026.06.18**: Refine Magnet with its official menu icon, launcher-relative responsive positioning, unobstructed iframe content, and the `time->asana+deltek` workspace.

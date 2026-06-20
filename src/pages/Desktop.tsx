@@ -1,6 +1,6 @@
 import React from "react";
 import { apps, wallpapers, workspaceLayouts } from "~/configs";
-import { useOmkpieUtilities } from "~/hooks/useOmkpieUtilities";
+import { useOmkpieUtilities, useOmkpieUtilityVersion } from "~/hooks/useOmkpieUtilities";
 import { minMarginY } from "~/utils";
 import type { MacActions } from "~/types";
 import AboutThisMac from "~/components/AboutThisMac";
@@ -47,7 +47,7 @@ interface DesktopState {
 }
 
 export default function Desktop(props: MacActions) {
-  const dynamicLaunchpadApps = useOmkpieUtilities(props.currentUserAvatar);
+  const { utilities: dynamicLaunchpadApps } = useOmkpieUtilities(props.currentUserAvatar);
   const [state, setState] = useState({
     showApps: {},
     appsZ: {},
@@ -193,7 +193,7 @@ export default function Desktop(props: MacActions) {
         utilityWindow: {
           title,
           src,
-          version: version ?? "v0.0.1",
+          version: version ?? "0.0.1",
           refreshKey: 0,
           z: nextZ,
           max: false,
@@ -540,6 +540,26 @@ export default function Desktop(props: MacActions) {
     return windows;
   };
 
+  // Resolves the live `/api/utilities/status` version for a given iframe
+  // src by matching its pathname against the `endpoint` field. Used by
+  // the dock-iframe `activeUtility` branch below so the top-bar menu
+  // reports the same version Launchpad / Spotlight show for dynamic
+  // utility windows.
+  const iframeApp = (() => {
+    const focused = state.currentTitle;
+    if (!focused) return null;
+    const app = apps.find((a) => a.title === focused && a.iframeSrc);
+    if (!app || !app.iframeSrc) return null;
+    return app;
+  })();
+  const iframeAppLiveVersion = useOmkpieUtilityVersion(
+    iframeApp?.iframeSrc,
+    props.currentUserAvatar
+  );
+  const iframeAppVersion = iframeApp
+    ? iframeAppLiveVersion ?? iframeApp.iframeVersion ?? "0.0.1"
+    : undefined;
+
   return (
     <div
       className="size-full overflow-hidden bg-center bg-cover"
@@ -558,18 +578,14 @@ export default function Desktop(props: MacActions) {
                 src: state.utilityWindow.src,
                 version: state.utilityWindow.version
               }
-            : (() => {
-                const focused = state.currentTitle;
-                if (!focused) return null;
-                const app = apps.find((a) => a.title === focused && a.iframeSrc);
-                if (!app || !app.iframeSrc) return null;
-                return {
-                  id: app.id,
-                  title: app.title,
-                  src: app.iframeSrc,
-                  version: `v${app.iframeVersion ?? "0.0.1"}`
-                };
-              })()
+            : iframeApp && iframeAppVersion
+              ? {
+                  id: iframeApp.id,
+                  title: iframeApp.title,
+                  src: iframeApp.iframeSrc as string,
+                  version: iframeAppVersion
+                }
+              : null
         }
         refreshUtility={refreshUtility}
         openUtilityInNewTab={openUtilityInNewTab}
