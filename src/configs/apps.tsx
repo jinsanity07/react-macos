@@ -85,7 +85,7 @@ const apps: AppsData[] = [
     height: 600,
     img: "img/icons/launchpad/gungnir.png",
     iframeSrc: "https://o.mkpie.me/app/gasana",
-    iframeVersion: "0.0.2"
+    iframeVersion: "0.0.1"
   },
   {
     id: "deltekpro",
@@ -107,7 +107,7 @@ const apps: AppsData[] = [
     height: 600,
     img: "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource221/v4/66/95/d0/6695d0b8-a4dc-8e49-9c58-5266b699d2eb/Placeholder.mill/400x400bb-75.webp",
     iframeSrc: "https://o.mkpie.me/static/cloud/clean-single-bundle.html",
-    iframeVersion: "0.0.2"
+    iframeVersion: "0.0.1"
   },
   {
     id: "vscode",

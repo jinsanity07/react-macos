@@ -21,6 +21,12 @@ export interface AppsData {
    * top bar (Open in New Tab / Refresh / Version).
    */
   iframeSrc?: string;
-  /** Display version when `iframeSrc` is set. Defaults to `0.0.1`. */
+  /**
+   * Display version when `iframeSrc` is set. The runtime resolves the
+   * real version from `/api/utilities/status` by matching the src's
+   * pathname to a utility `endpoint`; this field is the static fallback
+   * when the API is unreachable or the src isn't an omkpie endpoint.
+   * Defaults to `0.0.1`.
+   */
   iframeVersion?: string;
 }
