@@ -56,13 +56,13 @@ const launchpadApps: LaunchpadData[] = [
     id: "grafana",
     title: "Grafana",
     img: "https://amz.mkpie.me/public/build/static/img/grafana_icon.1e0deb6b.svg",
-    link: "https://amz.mkpie.me/"
+    link: "https://amz.mkpie.me/d/e5993871-b0ac-4953-a858-c1e3f3c3ffaf/aws?orgId=1&from=now-6h&to=now&timezone=browser"
   },
   {
     id: "activity-monitor",
     title: "Activity Monitor",
     img: "https://cdn.jim-nielsen.com/macos/512/activity-monitor-2021-04-22.png?rf=1024",
-    link: "https://amz.mkpie.me/d/e5993871-b0ac-4953-a858-c1e3f3c3ffaf/aws?orgId=1&from=now-6h&to=now&timezone=browser"
+    link: "https://cf-server-monitor.jinsanityff.workers.dev/"
   },
   {
     id: "utility-ra2web",
