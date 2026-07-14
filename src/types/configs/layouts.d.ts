@@ -5,5 +5,6 @@ export interface WorkspaceLayoutSlot {
 export interface WorkspaceLayoutData {
   id: string;
   label: string;
+  arrangement: "equal-columns" | "stacked-left";
   slots: WorkspaceLayoutSlot[];
 }
