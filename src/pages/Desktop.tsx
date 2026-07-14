@@ -438,7 +438,7 @@ export default function Desktop(props: MacActions) {
                 x: 0,
                 y: 0,
                 width: stackedWindowWidth,
-                height: stackedWindowHeight
+                height: workspaceHeight
               },
               {
                 x: cascadeOffset,
