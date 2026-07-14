@@ -1,7 +1,7 @@
 import React from "react";
 import { apps, wallpapers, workspaceLayouts } from "~/configs";
 import { useOmkpieUtilities, useOmkpieUtilityVersion } from "~/hooks/useOmkpieUtilities";
-import { minMarginY } from "~/utils";
+import { appBarHeight, minMarginY } from "~/utils";
 import type { MacActions } from "~/types";
 import AboutThisMac from "~/components/AboutThisMac";
 import type { AppWindowGeometry } from "~/components/AppWindow";
@@ -419,7 +419,41 @@ export default function Desktop(props: MacActions) {
     setState((prev) => {
       const revision = prev.layoutRevision + 1;
       const workspaceHeight = Math.max(1, winHeight - minMarginY - (dockSize + 15 + 4));
-      const columnWidth = Math.max(1, winWidth) / layoutApps.length;
+      const workspaceWidth = Math.max(1, winWidth);
+      const columnWidth = workspaceWidth / layoutApps.length;
+      const equalColumnGeometries = layoutApps.map((_app, index) => ({
+        x: index * columnWidth,
+        y: 0,
+        width: columnWidth,
+        height: workspaceHeight
+      }));
+      const leftHalfWidth = workspaceWidth / 2;
+      const cascadeOffset = Math.min(72, Math.max(48, workspaceWidth * 0.05));
+      const stackedWindowWidth = Math.max(1, leftHalfWidth - cascadeOffset);
+      const stackedWindowHeight = Math.max(1, workspaceHeight - appBarHeight);
+      const layoutGeometries =
+        layout.arrangement === "stacked-left" && layoutApps.length === 3
+          ? [
+              {
+                x: 0,
+                y: 0,
+                width: stackedWindowWidth,
+                height: stackedWindowHeight
+              },
+              {
+                x: cascadeOffset,
+                y: appBarHeight,
+                width: stackedWindowWidth,
+                height: stackedWindowHeight
+              },
+              {
+                x: leftHalfWidth,
+                y: 0,
+                width: workspaceWidth - leftHalfWidth,
+                height: workspaceHeight
+              }
+            ]
+          : equalColumnGeometries;
       const showApps = { ...prev.showApps };
       const appsZ = { ...prev.appsZ };
       const maxApps = { ...prev.maxApps };
@@ -434,10 +468,7 @@ export default function Desktop(props: MacActions) {
         maxApps[app.id] = false;
         minApps[app.id] = false;
         windowGeometries[app.id] = {
-          x: index * columnWidth,
-          y: 0,
-          width: columnWidth,
-          height: workspaceHeight,
+          ...layoutGeometries[index],
           revision
         };
       });
