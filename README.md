@@ -56,7 +56,7 @@ Three layouts are available:
 - `time->work+out`: Own Pie, Deltek Pro, and Jog-log.
 - `time->asana+deltek`: Own Pie, Asana, and Deltek Pro.
 
-The two `time->` layouts open their apps in equal left-to-right columns. The `[time,asana] + deltek` layout uses a 50/50 workspace split: Own Pie and Asana overlap in a cascade on the left, while Deltek Pro uses the full right half. All layouts keep the menu bar, Dock, and unrelated windows available.
+The two `time->` layouts open their apps in equal left-to-right columns. The `[time,asana] + deltek` layout uses a 50/50 workspace split: Own Pie and Asana overlap in a cascade on the left, while Deltek Pro uses the full right half. Asana shifts right by 5% of the workspace width, clamped to 48–72px, and down by the 24px title-bar height. All layouts keep the menu bar, Dock, and unrelated windows available.
 
 Layouts are defined in [`src/configs/layouts.ts`](src/configs/layouts.ts). Add another object with a stable `id`, menu `label`, an `arrangement` of `equal-columns` or `stacked-left`, and ordered `slots` containing desktop app IDs. The `stacked-left` arrangement expects three slots: the first two cascade in the left half and the third fills the right half. Each referenced app must be registered in [`src/configs/apps.tsx`](src/configs/apps.tsx) with `desktop: true`; set `dock: false` when the app should be launchable by layouts and Spotlight without appearing in the Dock.
 
