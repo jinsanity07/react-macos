@@ -421,12 +421,6 @@ export default function Desktop(props: MacActions) {
       const workspaceHeight = Math.max(1, winHeight - minMarginY - (dockSize + 15 + 4));
       const workspaceWidth = Math.max(1, winWidth);
       const columnWidth = workspaceWidth / layoutApps.length;
-      const equalColumnGeometries = layoutApps.map((_app, index) => ({
-        x: index * columnWidth,
-        y: 0,
-        width: columnWidth,
-        height: workspaceHeight
-      }));
       const leftHalfWidth = workspaceWidth / 2;
       const cascadeOffset = Math.min(72, Math.max(48, workspaceWidth * 0.05));
       const stackedWindowWidth = Math.max(1, leftHalfWidth - cascadeOffset);
@@ -453,7 +447,12 @@ export default function Desktop(props: MacActions) {
                 height: workspaceHeight
               }
             ]
-          : equalColumnGeometries;
+          : layoutApps.map((_app, index) => ({
+              x: index * columnWidth,
+              y: 0,
+              width: columnWidth,
+              height: workspaceHeight
+            }));
       const showApps = { ...prev.showApps };
       const appsZ = { ...prev.appsZ };
       const maxApps = { ...prev.maxApps };
