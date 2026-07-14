@@ -50,16 +50,17 @@ pnpm build
 
 Use the blue three-bar Magnet icon in the menu bar to apply a configured desktop workspace. The panel opens 6px below the launcher, aligns its right edge with the launcher, and stays clamped inside the viewport.
 
-Two layouts are available:
+Three layouts are available:
 
+- `[time,asana] + deltek`: Own Pie and Asana cascaded in the left half, with Deltek Pro filling the right half.
 - `time->work+out`: Own Pie, Deltek Pro, and Jog-log.
 - `time->asana+deltek`: Own Pie, Asana, and Deltek Pro.
 
-Each layout opens its apps in equal left-to-right columns while keeping the menu bar, Dock, and unrelated windows available.
+The two `time->` layouts open their apps in equal left-to-right columns. The `[time,asana] + deltek` layout uses a 50/50 workspace split: Own Pie and Asana overlap in a cascade on the left, while Deltek Pro uses the full right half. All layouts keep the menu bar, Dock, and unrelated windows available.
 
-Layouts are defined in [`src/configs/layouts.ts`](src/configs/layouts.ts). Add another object with a stable `id`, menu `label`, and ordered `slots` containing desktop app IDs. Each referenced app must be registered in [`src/configs/apps.tsx`](src/configs/apps.tsx) with `desktop: true`; set `dock: false` when the app should be launchable by layouts and Spotlight without appearing in the Dock.
+Layouts are defined in [`src/configs/layouts.ts`](src/configs/layouts.ts). Add another object with a stable `id`, menu `label`, an `arrangement` of `equal-columns` or `stacked-left`, and ordered `slots` containing desktop app IDs. The `stacked-left` arrangement expects three slots: the first two cascade in the left half and the third fills the right half. Each referenced app must be registered in [`src/configs/apps.tsx`](src/configs/apps.tsx) with `desktop: true`; set `dock: false` when the app should be launchable by layouts and Spotlight without appearing in the Dock.
 
-Applying a layout opens or restores its apps, resets maximize/minimize state, raises them above existing windows, and recalculates the equal columns when the viewport or Dock size changes. Iframe content is unobstructed; focus an iframe app and use its app-name menu in the top bar for Open in New Tab, Refresh Page, and Version.
+Applying a layout opens or restores its apps, resets maximize/minimize state, raises them above existing windows, and recalculates its geometry when the viewport or Dock size changes. Iframe content is unobstructed; focus an iframe app and use its app-name menu in the top bar for Open in New Tab, Refresh Page, and Version.
 
 The iframe destinations must allow framing and may still require their own authentication. If a destination blocks embedding, use Open in New Tab instead of proxying it or bypassing its frame protections.
 
@@ -94,6 +95,8 @@ The prefix **`i-mdi`** in `i-mdi:chart-bar-stacked` refers to an icon library in
 
 
 ## Changelog
+
+- **Update 2026.07.14**: Add the `[time,asana] + deltek` Magnet workspace, cascading Own Pie and Asana in the left half while Deltek Pro fills the right half.
 
 - **Update 2026.07.03**: Update Grafana URL to the AWS dashboard and Activity Monitor URL to the Cloudflare server monitor worker.
 
