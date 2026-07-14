@@ -414,6 +414,20 @@ export default function Desktop(props: MacActions) {
       const app = apps.find((item) => item.id === slot.appId && item.desktop);
       return app ? [app] : [];
     });
+    const useStackedGeometry =
+      layout.arrangement === "stacked-left" && layoutApps.length === 3;
+
+    if (
+      import.meta.env.DEV &&
+      layout.arrangement === "stacked-left" &&
+      !useStackedGeometry
+    ) {
+      console.warn(
+        `Workspace layout "${layout.id}" resolves to ${layoutApps.length} desktop apps; ` +
+          'the "stacked-left" arrangement expects exactly 3.'
+      );
+    }
+
     if (layoutApps.length === 0) return;
 
     setState((prev) => {
@@ -425,34 +439,33 @@ export default function Desktop(props: MacActions) {
       const cascadeOffset = Math.min(72, Math.max(48, workspaceWidth * 0.05));
       const stackedWindowWidth = Math.max(1, leftHalfWidth - cascadeOffset);
       const stackedWindowHeight = Math.max(1, workspaceHeight - appBarHeight);
-      const layoutGeometries =
-        layout.arrangement === "stacked-left" && layoutApps.length === 3
-          ? [
-              {
-                x: 0,
-                y: 0,
-                width: stackedWindowWidth,
-                height: workspaceHeight
-              },
-              {
-                x: cascadeOffset,
-                y: appBarHeight,
-                width: stackedWindowWidth,
-                height: stackedWindowHeight
-              },
-              {
-                x: leftHalfWidth,
-                y: 0,
-                width: workspaceWidth - leftHalfWidth,
-                height: workspaceHeight
-              }
-            ]
-          : layoutApps.map((_app, index) => ({
-              x: index * columnWidth,
+      const layoutGeometries = useStackedGeometry
+        ? [
+            {
+              x: 0,
               y: 0,
-              width: columnWidth,
+              width: stackedWindowWidth,
               height: workspaceHeight
-            }));
+            },
+            {
+              x: cascadeOffset,
+              y: appBarHeight,
+              width: stackedWindowWidth,
+              height: stackedWindowHeight
+            },
+            {
+              x: leftHalfWidth,
+              y: 0,
+              width: workspaceWidth - leftHalfWidth,
+              height: workspaceHeight
+            }
+          ]
+        : layoutApps.map((_app, index) => ({
+            x: index * columnWidth,
+            y: 0,
+            width: columnWidth,
+            height: workspaceHeight
+          }));
       const showApps = { ...prev.showApps };
       const appsZ = { ...prev.appsZ };
       const maxApps = { ...prev.maxApps };
