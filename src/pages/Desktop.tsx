@@ -224,21 +224,6 @@ export default function Desktop(props: MacActions) {
     window.open(src, "_blank", "noopener,noreferrer");
   };
 
-  const focusIframeApp = (id: string): void => {
-    setState((prev) => {
-      const app = apps.find((a) => a.id === id);
-      if (!app || !app.iframeSrc) return prev;
-      const nextZ = prev.maxZ + 1;
-
-      return {
-        ...prev,
-        appsZ: { ...prev.appsZ, [id]: nextZ },
-        maxZ: nextZ,
-        currentTitle: app.title
-      };
-    });
-  };
-
   const closeUtilityWindow = (): void => {
     setState((prev) => ({
       ...prev,
@@ -520,6 +505,11 @@ export default function Desktop(props: MacActions) {
           x: app.x,
           y: app.y,
           z: state.appsZ[app.id],
+          active:
+            state.currentTitle === app.title &&
+            state.appsZ[app.id] === state.maxZ &&
+            state.showApps[app.id] &&
+            !state.minApps[app.id],
           max: state.maxApps[app.id],
           min: state.minApps[app.id],
           geometry: state.windowGeometries[app.id],
@@ -565,6 +555,11 @@ export default function Desktop(props: MacActions) {
           max={state.utilityWindow.max}
           min={state.utilityWindow.min}
           z={state.utilityWindow.z}
+          active={
+            state.currentTitle === state.utilityWindow.title &&
+            state.utilityWindow.z === state.maxZ &&
+            !state.utilityWindow.min
+          }
           close={closeUtilityWindow}
           setMax={setUtilityMax}
           setMin={setUtilityMin}

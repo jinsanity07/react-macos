@@ -45,6 +45,7 @@ interface TrafficProps {
 
 interface WindowProps extends TrafficProps {
   title: string;
+  active: boolean;
   min: boolean;
   width?: number;
   height?: number;
@@ -119,6 +120,7 @@ const TrafficLights = ({ id, close, aspectRatio, max, setMax, setMin }: TrafficP
 const Window = (props: WindowProps) => {
   const dockSize = useStore((state) => state.dockSize);
   const { winWidth, winHeight } = useWindowSize();
+  const [finishingTouchActivation, setFinishingTouchActivation] = useState(false);
 
   const initWidth = Math.min(winWidth, props.width || 640);
   const initHeight = Math.min(winHeight, props.height || 400);
@@ -165,6 +167,13 @@ const Window = (props: WindowProps) => {
   const width = props.max ? winWidth : state.width;
   const height = props.max ? winHeight : state.height;
   const disableMax = props.aspectRatio !== undefined;
+  const focusWindow = (): void => {
+    if (!props.active) props.focus(props.id);
+  };
+  const finishTouchActivation = (event: React.TouchEvent<HTMLDivElement>): void => {
+    event.preventDefault();
+    setFinishingTouchActivation(false);
+  };
 
   const children = React.cloneElement(props.children as React.ReactElement, {
     width: width
@@ -235,7 +244,8 @@ const Window = (props: WindowProps) => {
       lockAspectRatio={props.aspectRatio}
       lockAspectRatioExtraHeight={props.aspectRatio ? appBarHeight : undefined}
       style={{ zIndex: props.z }}
-      onMouseDown={() => props.focus(props.id)}
+      onMouseDown={focusWindow}
+      onTouchStart={focusWindow}
       className={`overflow-hidden ${round} ${border} shadow-lg shadow-black/30 ${minimized}`}
       id={`window-${props.id}`}
     >
@@ -253,7 +263,22 @@ const Window = (props: WindowProps) => {
         />
         <span className="font-semibold text-c-700">{props.title}</span>
       </div>
-      <div className="innner-window w-full overflow-y-hidden">{children}</div>
+      <div className="innner-window relative w-full overflow-y-hidden">
+        {children}
+        {(!props.active || finishingTouchActivation) && (
+          <div
+            className="absolute inset-0"
+            aria-hidden="true"
+            data-window-activation-shield
+            onPointerDown={(event) => {
+              if (event.pointerType === "touch") setFinishingTouchActivation(true);
+            }}
+            onTouchStart={() => setFinishingTouchActivation(true)}
+            onTouchEnd={finishTouchActivation}
+            onTouchCancel={finishTouchActivation}
+          />
+        )}
+      </div>
     </Rnd>
   );
 };

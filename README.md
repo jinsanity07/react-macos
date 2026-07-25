@@ -96,6 +96,8 @@ The prefix **`i-mdi`** in `i-mdi:chart-bar-stacked` refers to an icon library in
 
 ## Changelog
 
+- **Update 2026.07.25**: Activate inactive app windows from any exposed content surface. The first mouse click or touch tap raises the window and updates the menu bar without triggering React or iframe content; the second interaction works normally, while title bars and window controls remain directly usable.
+
 - **Update 2026.07.14**: Add the `[time,asana] + deltek` Magnet workspace, cascading Own Pie and Asana in the left half while Deltek Pro fills the right half.
 
 - **Update 2026.07.03**: Update Grafana URL to the AWS dashboard and Activity Monitor URL to the Cloudflare server monitor worker.
